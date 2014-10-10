@@ -7,7 +7,7 @@ function start() {
 		var pathname = url.parse(request.url).pathname;
 		var components = pathname.split('/');
 		
-		response.writeHead(200, {"Content-Type": "application/json"});
+		response.writeHead(200, {"Content-Type": "application/json", "Access-Control-Allow-Origin": "http://localhost:8000"});
 		
 		if (components[1] == "fabrics") {
 			response.write(JSON.stringify(fabric.list()));
