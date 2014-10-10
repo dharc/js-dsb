@@ -1,0 +1,33 @@
+body, html {
+	margin: 0px;
+	height: 100%;
+}
+
+div#myLayout {
+	height: 100%;
+}
+
+div#defaultview {
+	width: 100%;
+	height: 100%;
+	font-size: 52pt;
+	text-align: center;
+	padding-top: 100px;
+	color: white;
+	font-family: arial;
+	font-weight: bold;
+/* thanks to http://blog.fakedarren.com/2010/01/cross-browser-css-gradients/ */
+	/* and http://www.puremango.co.uk/2010/04/css-gradient/ */
+	/* fallback (Opera) */
+	background: #09284B;
+
+	/* Mozilla: */
+	background: -moz-linear-gradient(top, #09284B, #000000);
+
+	/* Chrome, Safari:*/
+	background: -webkit-gradient(linear, left top, left bottom, from(#29454B), to(#000000));
+
+	/* MSIE */
+	filter: progid:DXImageTransform.Microsoft.Gradient(
+	StartColorStr='#09284B', EndColorStr='#000000', GradientType=0);
+}
