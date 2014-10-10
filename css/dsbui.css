@@ -3,6 +3,83 @@ body, html {
 	height: 100%;
 }
 
+div.loginform {
+	margin-top: 20px;
+}
+
+div.loginlabel {
+	float: left;
+	width: 115px;
+	text-align: right;
+	height: 25px;
+	padding-top: 6px;
+	margin-right: 5px;
+}
+
+button {
+   border: 1px solid #999999;
+   background: #b1b1b1;
+   background: -webkit-gradient(linear, left top, left bottom, from(#e4e4e4), to(#b1b1b1));
+   background: -webkit-linear-gradient(top, #e4e4e4, #b1b1b1);
+   background: -moz-linear-gradient(top, #e4e4e4, #b1b1b1);
+   background: -ms-linear-gradient(top, #e4e4e4, #b1b1b1);
+   background: -o-linear-gradient(top, #e4e4e4, #b1b1b1);
+   padding: 8px 16px;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+   /*-webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;*/
+   color: #272727;
+   font-size: 12px;
+   font-family: Georgia, serif;
+   text-decoration: none;
+   vertical-align: middle;
+   }
+button:hover {
+   border-top-color: #9c1919;
+   background: #9c1919;
+   color: #ccc;
+   }
+button:active {
+   border-top-color: #1b435e;
+   background: #1b435e;
+   }
+
+button.emph {
+   border-top: 1px solid #5ed67a;
+   background: #177822;
+   background: -webkit-gradient(linear, left top, left bottom, from(#3aa624), to(#177822));
+   background: -webkit-linear-gradient(top, #3aa624, #177822);
+   background: -moz-linear-gradient(top, #3aa624, #177822);
+   background: -ms-linear-gradient(top, #3aa624, #177822);
+   background: -o-linear-gradient(top, #3aa624, #177822);
+   padding: 8px 16px;
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+   /*-webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;*/
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: white;
+   font-size: 12px;
+   font-family: Georgia, serif;
+   text-decoration: none;
+   vertical-align: middle;
+   }
+button.emph:hover {
+   border-top-color: #9c1919;
+   background: #9c1919;
+   color: #ccc;
+   }
+button.emph:active {
+   border-top-color: #1b435e;
+   background: #1b435e;
+   }
+
 div#myLayout {
 	height: 100%;
 }
@@ -16,18 +93,6 @@ div#defaultview {
 	color: white;
 	font-family: arial;
 	font-weight: bold;
-/* thanks to http://blog.fakedarren.com/2010/01/cross-browser-css-gradients/ */
-	/* and http://www.puremango.co.uk/2010/04/css-gradient/ */
-	/* fallback (Opera) */
-	background: #09284B;
-
-	/* Mozilla: */
-	background: -moz-linear-gradient(top, #09284B, #000000);
-
-	/* Chrome, Safari:*/
-	background: -webkit-gradient(linear, left top, left bottom, from(#29454B), to(#000000));
-
-	/* MSIE */
-	filter: progid:DXImageTransform.Microsoft.Gradient(
-	StartColorStr='#09284B', EndColorStr='#000000', GradientType=0);
+	background-image: url('/images/mountains.jpg');
+	background-repeat: none;
 }
