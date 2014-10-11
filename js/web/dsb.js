@@ -7,11 +7,12 @@
 
 	DSB.prototype.sendCommand = function(cmd,data,cb) {
 		$.ajax({
+			type: "POST",
 			url: this.remote+cmd,
-			dataType: "jsonp",
-			method: "POST",
 			data: data,
-			success: cb
+			contentType: "application/json;charset=utf-8",
+			success: cb,
+			dataType: "jsonp"
 		});
 	};
 
@@ -23,8 +24,22 @@
 		this.sendCommand("/fabrics","",cb);
 	};
 
+	DSB.prototype.signup = function(username,password,email,first,last,cb) {
+		this.sendCommand("/signup?username="+username+"&password="+password+"&email="+email+"&first="+first+"&last="+last,undefined, function(data) {
+			if (data === undefined || data.success === undefined) {
+				cb(false,"Unable to contact server");
+			} else {
+				if (data.success == "true") {
+					cb(true,"");
+				} else {
+					cb(false,data.reason);
+				}
+			}
+		});
+	};
+
 	DSB.prototype.login = function(username, password, cb) {
-		this.sendCommand("/login","{username: \""+username+"\", password: \""+password+"\"}", function(data) {
+		this.sendCommand("/login?username="+username+"&password="+password,undefined, function(data) {
 			console.log(data);
 			if (data === undefined || data.success === undefined) {
 				cb(false,"Unable to contact server");

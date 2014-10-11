@@ -3,6 +3,17 @@
 		this.dsb = dsb;
 	};
 
+	DSBUI.prototype.makeLayout = function() {
+		$('#myLayout').w2layout({
+		    name: 'myLayout',
+		    panels: [ 
+				{ type: 'top', size: 30, content: "<div id=\"myToolbar\"></div>" },
+		        { type: 'left', size: 200, resizable: true, content: "<div id=\"mySidebar\" style=\"height: 450px;\"></div>" },
+				{ type: 'main', content: "<div id=\"defaultview\">DSB</div>" }
+		    ]
+		});
+	};
+
 	DSBUI.prototype.makeToolbar = function() {
 		$('#myToolbar').w2toolbar({
 		    name : 'myToolbar',
@@ -63,20 +74,11 @@
 		});
 	};
 
-	DSBUI.prototype.login = function() {
-		var username = $('#dsb_username')[0].value;
-		var password = $('#dsb_password')[0].value;
-		var me = this;
-
-		//Do some validation checks before sending to server...
-
-		this.dsb.login(username,password, function(success,reason) {
-			if (success == true) {
-				me.showSessions();
-			} else {
-				w2popup.open({title: reason});
-			}
-		});
+	DSBUI.prototype.session = function() {
+		w2popup.close();
+		this.makeLayout();
+		this.makeToolbar();
+		this.makeSidebar();
 	};
 
 	DSBUI.prototype.showSessions = function() {
@@ -85,7 +87,7 @@
 		w2popup.open({
 			title: 'Choose Session',
 			body: '<div id="sessionGrid" style="height: 300px"></div>',
-			buttons: '<button>Load</button><button>New</button>',
+			buttons: '<button onclick="dsbui.session();">Load</button><button class="emph">New</button>',
 			modal: true,
 			width: 400,
 			height: 350,
@@ -115,29 +117,111 @@
 		});
 	};
 
-	DSBUI.prototype.showSignup = function() {
-		w2popup.open({
-			title: 'Sign-up',
-			body: 'Username: <input type="text"><br/>Password: <input type="password">',
-			buttons: '<button onclick="dsbui.signup();">Sign-up</button>',
+	/*
+	 * Display a signup popup window with a signup button.
+	 */
+	DSBUI.prototype.showSignup = function(title) {
+		var me = this;
+
+		//Create the popup
+		$('#signuppopup').w2popup({
+			title: title,
+			buttons: '<button id="btn_signup2" class="emph">Sign-up</button>',
 			modal: true,
-			width: 300,
-			height: 200,
+			width: 350,
+			height: 300,
 			showClose: false,
 			keyboard: false
 		});
+
+		//Check the username is alphanumeric and long enough
+		$('div#w2ui-popup #dsb_susername').keyup(function() {
+			if (this.value.search(/^[a-zA-Z0-9]+$/ig) == -1) {
+				$(this).removeClass("valid").addClass("invalid");
+			} else {
+				$(this).removeClass("invalid").addClass("valid");
+			}
+		});
+
+		//Check the password is long/complex enough
+		$('div#w2ui-popup #dsb_spassword').keyup(function() {
+			if (this.value.length < 8) {
+				$(this).removeClass("valid").addClass("invalid");
+			} else {
+				$(this).removeClass("invalid").addClass("valid");
+			}
+		});
+
+		//Check the confirm password is same as password
+		$('div#w2ui-popup #dsb_sconfirm').keyup(function() {
+			var password = $('div#w2ui-popup #dsb_spassword')[0].value;
+			if (this.value != password) {
+				$(this).removeClass("valid").addClass("invalid");
+			} else {
+				$(this).removeClass("invalid").addClass("valid");
+			}
+		});
+
+		//Check the e-mail is an e-mail address
+		$('div#w2ui-popup #dsb_semail').keyup(function() {
+			if (this.value.search(/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/ig) == -1) {
+				$(this).removeClass("valid").addClass("invalid");
+			} else {
+				$(this).removeClass("invalid").addClass("valid");
+			}
+		});
+
+		//When the sign-up button is clicked...
+		$('#btn_signup2').click(function () {
+			var username = $('div#w2ui-popup #dsb_susername')[0].value;
+			var password = $('div#w2ui-popup #dsb_spassword')[0].value;
+			var confirm = $('div#w2ui-popup #dsb_sconfirm')[0].value;
+			var email = $('div#w2ui-popup #dsb_semail')[0].value;
+			var first = $('div#w2ui-popup #dsb_sfirst')[0].value;
+			var last = $('div#w2ui-popup #dsb_slast')[0].value;
+
+			//Send request to server and check result
+			me.dsb.signup(username,password,email,first,last, function(success,reason) {
+				if (success == true) {
+					me.showLogin("Sign-up Complete");
+				} else {
+					//Oops, try again
+					me.showSignup(reason);
+				}
+			});
+		});
 	};
 
-	DSBUI.prototype.showLogin = function() {
-		w2popup.open({
-			title: 'Login',
-			body: '<div class="loginform"><div class="loginlabel">Username:</div> <input class="login" id="dsb_username" type="text"><br/><div class="loginlabel">Password:</div> <input id="dsb_password" type="password"></div>',
-			buttons: '<button onclick="dsbui.login();">Login</button><button onclick="dsbui.showSignup();" class="emph">Sign-up</button>',
+	DSBUI.prototype.showLogin = function(title) {
+		var me = this;
+
+		$('#loginpopup').w2popup({
+			title: title,
+			buttons: '<button id="btn_login">Login</button><button id="btn_signup1" class="emph">Sign-up</button>',
 			modal: true,
 			width: 350,
 			height: 200,
 			showClose: false,
 			keyboard: false
+		});
+
+		$('#btn_login').click(function() {
+			var username = $('div#w2ui-popup #dsb_username')[0].value;
+			var password = $('div#w2ui-popup #dsb_password')[0].value;
+
+			//Do some validation checks before sending to server...
+
+			me.dsb.login(username,password, function(success,reason) {
+				if (success == true) {
+					me.showSessions();
+				} else {
+					me.showLogin(reason);
+				}
+			});
+		});
+
+		$('#btn_signup1').click(function() {
+			me.showSignup("Sign-up");
 		});
 	};
 

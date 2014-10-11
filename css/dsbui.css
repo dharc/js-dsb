@@ -3,11 +3,28 @@ body, html {
 	height: 100%;
 }
 
+span.required {
+	color: red;
+}
+
 div.loginform {
 	margin-top: 20px;
 }
 
 div.loginlabel {
+	float: left;
+	width: 115px;
+	text-align: right;
+	height: 25px;
+	padding-top: 6px;
+	margin-right: 5px;
+}
+
+div.signupform {
+	margin-top: 20px;
+}
+
+div.signuplabel {
 	float: left;
 	width: 115px;
 	text-align: right;
@@ -38,11 +55,7 @@ button {
    text-decoration: none;
    vertical-align: middle;
    }
-button:hover {
-   border-top-color: #9c1919;
-   background: #9c1919;
-   color: #ccc;
-   }
+
 button:active {
    border-top-color: #1b435e;
    background: #1b435e;
@@ -70,11 +83,7 @@ button.emph {
    text-decoration: none;
    vertical-align: middle;
    }
-button.emph:hover {
-   border-top-color: #9c1919;
-   background: #9c1919;
-   color: #ccc;
-   }
+
 button.emph:active {
    border-top-color: #1b435e;
    background: #1b435e;
@@ -95,4 +104,14 @@ div#defaultview {
 	font-weight: bold;
 	background-image: url('/images/mountains.jpg');
 	background-repeat: none;
+}
+
+input.invalid {
+	border-color: red;
+	background-color: #fffff0;
+}
+
+input.valid {
+	border-color: green;
+	background-color: #ffffff;
 }

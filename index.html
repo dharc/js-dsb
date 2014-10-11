@@ -10,6 +10,24 @@
 	<script src="js/web/dsbui.js"></script>
 </head>
 <body>
+	<div id="signuppopup" style="display: none;">
+		<div class="signupform">
+		<div class="signuplabel">Username:<span class="required">*</span></div> <input id="dsb_susername" class="signup" type="text"><br/>
+		<div class="signuplabel">Password:<span class="required">*</span></div> <input id="dsb_spassword" type="password"><br/>
+		<div class="signuplabel">Confirm:<span class="required">*</span></div> <input id="dsb_sconfirm" type="password"><br/>
+		<div class="signuplabel">E-Mail:<span class="required">*</span></div> <input id="dsb_semail" type="text"><br/>
+		<div class="signuplabel">Firstname:</div> <input id="dsb_sfirst" type="text"><br/>
+		<div class="signuplabel">Lastname:</div> <input id="dsb_slast" type="text">
+		</div>
+	</div>
+
+	<div id="loginpopup" style="display: none;">
+		<div class="loginform">
+		<div class="loginlabel">Username:</div> <input class="login" id="dsb_username" type="text"><br/>
+		<div class="loginlabel">Password:</div> <input id="dsb_password" type="password">
+		</div>
+	</div>
+
     <div id="myLayout"></div>
 </body>
 <script>
@@ -20,19 +38,7 @@ $(function () {
 	dsb = new DSB();
 	dsbui = new DSBUI(dsb);
 
-    $('#myLayout').w2layout({
-        name: 'myLayout',
-        panels: [ 
-			{ type: 'top', size: 30, content: "<div id=\"myToolbar\"></div>" },
-            { type: 'left', size: 200, resizable: true, content: "<div id=\"mySidebar\" style=\"height: 450px;\"></div>" },
-			{ type: 'main', content: "<div id=\"defaultview\">DSB</div>" }
-        ]
-    });
-
-	dsbui.makeToolbar();
-	dsbui.makeSidebar();
-
-	dsbui.showLogin();
+	dsbui.showLogin("Login");
 });
 </script>
 </html>
