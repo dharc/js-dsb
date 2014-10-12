@@ -2153,7 +2153,7 @@ button.btn-red.clicked {
 .w2ui-sidebar {
   cursor: default;
   overflow: hidden !important;
-  background-color: #edf1f6 !important;
+  background-color: #edf1f6 !important; /*Original = #edf1f6*/
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -2424,7 +2424,8 @@ button.btn-red.clicked {
   margin: 0px;
   padding: 2px;
   outline: 0px;
-  background-color: #efefef;
+  background-color: black; /* #efefef */
+  color: white;
   overflow: hidden !important;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -2464,7 +2465,8 @@ button.btn-red.clicked {
   color: #8d99a7;
 }
 .w2ui-toolbar table.w2ui-button .w2ui-tb-caption {
-  color: #000000;
+  color: #white;
+  font-weight: bold;
   padding: 0px 4px 0px 2px;
 }
 .w2ui-toolbar table.w2ui-button .w2ui-tb-count {

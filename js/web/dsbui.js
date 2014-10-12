@@ -7,9 +7,9 @@
 		$('#myLayout').w2layout({
 		    name: 'myLayout',
 		    panels: [ 
-				{ type: 'top', size: 30, content: "<div id=\"myToolbar\"></div>" },
-		        { type: 'left', size: 200, resizable: true, content: "<div id=\"mySidebar\" style=\"height: 450px;\"></div>" },
-				{ type: 'main', content: "<div id=\"defaultview\">DSB</div>" }
+				{ type: 'top', size: 27 },
+		        { type: 'left', size: 300, resizable: true, content: "<div id=\"mySidebar\" style=\"height: 450px;\"></div>" },
+				{ type: 'main', content: "<div id=\"defaultview\"></div>" }
 		    ]
 		});
 	};
@@ -18,7 +18,15 @@
 		$('#myToolbar').w2toolbar({
 		    name : 'myToolbar',
 		    items: [
-		        { type: 'check',  id: 'item1', caption: 'Check', img: 'icon-add', checked: true },
+				{ type: 'menu', id: 'sessionmenu', caption: 'Session', items: [
+						{ text: 'New' },
+						{ text: 'Save' },
+						{ text: 'Change' }
+					]},
+				{ type: 'menu', id: 'viewmenu', caption: 'View', items: [
+						{ text: 'Fullscreen' }
+					]}
+		        /*{ type: 'check',  id: 'item1', caption: 'Check', img: 'icon-add', checked: true },
 		        { type: 'break' },
 		        { type: 'menu',   id: 'item2', caption: 'Fabric', img: 'icon-folder', 
 		            items: [
@@ -31,7 +39,7 @@
 		        { type: 'radio',  id: 'item3',  group: '1', caption: 'Radio 1', img: 'icon-page' },
 		        { type: 'radio',  id: 'item4',  group: '1', caption: 'Radio 2', img: 'icon-page' },
 		        { type: 'spacer' },
-		        { type: 'button',  id: 'item5',  caption: 'Item 5', img: 'icon-save' }
+		        { type: 'button',  id: 'item5',  caption: 'Item 5', img: 'icon-save' }*/
 		    ]
 		});
 	};
@@ -79,6 +87,7 @@
 		this.makeLayout();
 		this.makeToolbar();
 		this.makeSidebar();
+		new DSBWindow({title: "My Workspace"});
 	};
 
 	DSBUI.prototype.showSessions = function() {

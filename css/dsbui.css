@@ -96,14 +96,10 @@ div#myLayout {
 div#defaultview {
 	width: 100%;
 	height: 100%;
-	font-size: 52pt;
-	text-align: center;
 	padding-top: 100px;
 	color: white;
 	font-family: arial;
-	font-weight: bold;
-	background-image: url('/images/mountains.jpg');
-	background-repeat: none;
+	background-image: url('/images/outlets.png');
 }
 
 input.invalid {
@@ -114,4 +110,82 @@ input.invalid {
 input.valid {
 	border-color: green;
 	background-color: #ffffff;
+}
+
+div#myToolbar {
+	z-index: 200;
+	position: absolute;
+	left: 0px;
+	width: 100%;
+	top: 0px;
+	height: 28px;
+	background-color: black;
+}
+
+div#menubottom {
+	z-index: 200;
+	background-image: url('/images/menu-bottomgrad.png');
+	height: 5px;
+	width: 100%;
+	position: absolute;
+	left: 0px;
+	top: 28px;
+}
+
+div#dsblogo {
+	position: absolute;
+	right: 15px;
+	top: 6px;
+	font-size: 12pt;
+	font-family: arial;
+	font-weight: bold;
+	color: #606060;
+	z-index: 200;
+}
+
+/* ------------- DSB Window -------------------*/
+
+div.dsbwindow-outer {
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+	border: 1px solid #222222;
+	background: white;
+	width: 300px;
+	height: 250px;
+	box-shadow: 0px 0px 15px #111111;
+	-webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+div.dsbwindow-title {
+	width: 100%;
+	height: 20px;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px 6px 0px 0px;
+	background-image: -webkit-linear-gradient(#efefef, #cecece);
+	background-image: -moz-linear-gradient(#ececec, #dfdfdf);
+	background-image: -ms-linear-gradient(#ececec, #dfdfdf);
+	background-image: -o-linear-gradient(#ececec, #dfdfdf);
+	background-image: linear-gradient(#efefef, #cecece);
+	color: #303030;
+	font-size: 8pt;
+	font-weight: bold;
+	border-bottom: 1px solid #fbfbfb;
+	padding-left: 15px;
+	padding-top: 2px;
+}
+
+div.dsbwindow-content {
+
+}
+
+div.dsbdown {
+  border: 4px solid transparent;
+  border-top: 5px solid #8D99A7;
+  margin-top: 5px;
 }
