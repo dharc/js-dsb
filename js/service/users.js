@@ -18,6 +18,10 @@ function signup(name,password,email,first,last) {
 	return {success: true};
 }
 
+function getName(sessid) {
+	return logins[sessid].username;
+}
+
 function isLoggedIn(sessid) {
 	if (logins[sessid] === undefined) {
 		return false;
@@ -44,5 +48,7 @@ function login(name,pass) {
 	return {success: true, sessid: users[name].session};
 };
 
+exports.getName = getName;
+exports.isLoggedIn = isLoggedIn;
 exports.login = login;
 exports.signup = signup;

@@ -32,15 +32,18 @@
 		$('#myToolbar').w2toolbar({
 		    name : 'myToolbar',
 		    items: [
-				{ type: 'menu', id: 'sessionmenu', caption: 'Session', items: [
-						{ text: 'New' },
-						{ text: 'Save' },
-						{ text: 'Change' }
+				{ type: 'menu', id: 'projectmenu', caption: 'Project', items: [
+						{ text: 'Hide Side-bar', id: "itemsb" },
+						{ text: 'Full Screen', id: "itemfs"},
+						{ text: 'Close All', id: "itemca" },
+						{ text: 'Project Properties', id: 'itempp' },
+						{ text: 'Release Mode', id: 'itemrm' }
 					]},
-				{ type: 'menu', id: 'viewmenu', caption: 'View', items: [
-						{ text: 'Sidebar', id: "itemsb" },
-						{ text: 'Fullscreen', id: "itemfs"},
-						{ text: 'Close All', id: "itemca" }
+				{ type: 'spacer' },
+				{ type: 'menu', id: 'usermenu', caption: this.dsb.username, items: [
+						{ text: 'Switch Project', id: 'userpro' },
+						{ text: 'Preferences', id: 'userpref' },
+						{ text: 'Log Out', id: 'userlogout' }
 					]}
 		    ],
 			onClick: function(event) {
@@ -57,13 +60,33 @@
 		    name  : 'mySidebar',
 		    img   : null,
 		    nodes : [ 
-		        { id: 'level-1', text: 'Workspaces', img: 'icon-folder', expanded: true, 
-		            nodes: [ 
-		                { id: 'level-1-1', text: 'My agent 1', img: 'icon-page' },
-		                { id: 'level-1-2', text: 'Auto Agent 1', img: 'icon-page' }
+		        { id: 'level-1', text: 'Project', img: 'icon-folder', expanded: true, 
+		            nodes: [
+						{ id: 'fabrics', text: 'Fabrics', img: 'icon-folder',
+							nodes: [
+								{ id: 'fab1', text: 'Model', img: 'icon-page' },
+								{ id: 'fab2', text: 'View1', img: 'icon-page' }
+							]},
+		                { id: 'workspaces', text: 'Workspaces', img: 'icon-folder',
+							nodes: [
+								{ id: 'work1', text: 'Myspace 1', img: 'icon-page' }
+							]},
+		                { id: 'views', text: 'Views', img: 'icon-folder',
+							nodes: [
+								{ id: 'view1', text: 'Default View', img: 'icon-page',
+									nodes: [
+										{ id: 'view1_oracles', text: 'Oracles', img: 'icon-page' },
+										{ id: 'view1_handles', text: 'Handles', img: 'icon-page' },
+										{ id: 'view1_actions', text: 'Actions', img: 'icon-page' }
+								]}
+							]},
+						{ id: 'layouts', text: 'Layouts', img: 'icon-folder',
+							nodes: [
+								{ id: 'layout1', text: 'Initial Layout', img: 'icon-page' }
+							]}
 		             ]
 		        },
-		        { id: 'level-2', text: 'Views', img: 'icon-folder',
+		        { id: 'level-2', text: 'Component Library', img: 'icon-folder',
 		            nodes: [ 
 		                { id: 'level-2-1', text: 'Level 2.1', img: 'icon-folder', 
 		                    nodes: [
@@ -76,7 +99,7 @@
 		                { id: 'level-2-3', text: 'Level 2.3', img: 'icon-page' }
 		            ]
 		        },
-		        { id: 'level-3', text: 'Controls', img: 'icon-folder',
+		        { id: 'level-3', text: 'Workspace Library', img: 'icon-folder',
 		            nodes: [
 		                { id: 'level-3-1', text: 'Level 3.1', img: 'icon-page' },
 		                { id: 'level-3-2', text: 'Level 3.2', img: 'icon-page' },
@@ -90,42 +113,49 @@
 		});
 	};
 
-	DSBUI.prototype.session = function() {
-		w2popup.close();
+	/*
+	 * A project has been selected so configure the screen.
+	 */
+	DSBUI.prototype.setProject = function(proname) {
 		this.makeLayout();
 		this.makeToolbar();
 		this.makeSidebar();
-		new DSBWindow({title: "My Workspace"});
+		new DSBWindow({title: "My Workspace", type: "workspace"});
 		new DSBWindow({title: "View1"});
 		new DSBWindow({title: "View2"});
 	};
 
-	DSBUI.prototype.showSessions = function() {
+	DSBUI.prototype.showProjects = function() {
 		var me = this;
 
 		w2popup.open({
-			title: 'Choose Session',
-			body: '<div id="sessionGrid" style="height: 300px"></div>',
-			buttons: '<button onclick="dsbui.session();">Load</button><button class="emph">New</button>',
+			title: 'Choose Project',
+			body: '<div id="projectGrid" style="height: 300px"></div>',
+			buttons: '<button id="btn_loadproject">Load</button><button class="emph" id="btn_newproject>New</button>',
 			modal: true,
-			width: 400,
+			width: 500,
 			height: 350,
 			showClose: false,
 			keyboard: false
 		});
 		w2popup.lock('',true);
 
-		this.dsb.getSessions(function(sessions) {
+		$('#btn_loadproject').click(function() {
+			w2popup.close();
+			me.setProject('NOPROJECT');
+		});
+
+		this.dsb.getProjects(function(projects) {
 			var items = [];
 			var i;
 
-			for (i=0; i<sessions.length; i++) {
-				items.push({recid: i+1, sname: sessions[i].name, sdesc: '', sdate: ''});
+			for (i=0; i<projects.length; i++) {
+				items.push({recid: i+1, sname: projects[i].name, sdesc: projects[i].description, sdate: projects[i].created});
 			}
 
 			w2popup.unlock();
-			$('#sessionGrid').w2grid({ 
-				name   : 'sessionGrid', 
+			$('#projectGrid').w2grid({ 
+				name   : 'projectGrid', 
 				columns: [                
 					{ field: 'sname', caption: 'Name', size: '40%' },
 					{ field: 'sdesc', caption: 'Description', size: '50%' },
@@ -232,7 +262,7 @@
 
 			me.dsb.login(username,password, function(success,reason) {
 				if (success == true) {
-					me.showSessions();
+					me.showProjects();
 				} else {
 					me.showLogin(reason);
 				}

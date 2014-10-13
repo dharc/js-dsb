@@ -12,7 +12,7 @@
 </head>
 <body>
 	<div id="myToolbar"></div>
-	<div id="dsblogo">DSB - v1</div>
+	<div id="dsblogo">Dynamic Structure Base</div>
 	<div id="menubottom"></div>
 	<div id="signuppopup" style="display: none;">
 		<div class="signupform">
@@ -42,7 +42,13 @@ $(function () {
 	dsb = new DSB();
 	dsbui = new DSBUI(dsb);
 
-	dsbui.showLogin("Login");
+	dsb.checkLogin(function(username) {
+		if (username === undefined) {
+			dsbui.showLogin("Login");
+		} else {
+			dsbui.showProjects();
+		}
+	});
 });
 </script>
 </html>

@@ -134,13 +134,17 @@ div#menubottom {
 
 div#dsblogo {
 	position: absolute;
-	right: 15px;
+	left: 50%;
+	margin-left: -150px;
+	width: 300px;
 	top: 6px;
-	font-size: 12pt;
+	font-size: 11pt;
 	font-family: arial;
 	font-weight: bold;
-	color: #606060;
+	color: white;
 	z-index: 200;
+	text-align: center;
+	text-shadow: 0px 0px 8px #a9a9a9;
 }
 
 /* ------------- DSB Window -------------------*/
@@ -173,12 +177,24 @@ div.dsbwindow-title {
 	background-image: -o-linear-gradient(#ececec, #dfdfdf);
 	background-image: linear-gradient(#efefef, #cecece);
 	color: #505050;
-	text-shadow: 0px 0px 4px #f9f9f9;
+	text-shadow: 0px 0px 4px #a9a9a9;
 	font-size: 8pt;
 	font-weight: bold;
 	border-bottom: 1px solid #a0a0a0;
 	padding-left: 20px;
 	padding-top: 2px;
+}
+
+div.dsbwindow-VIEW {
+	
+}
+
+div.dsbwindow-WORK {
+	background-image: -webkit-linear-gradient(#c1d1ef, #a7b5cf);
+	background-image: -moz-linear-gradient(#ececec, #dfdfdf);
+	background-image: -ms-linear-gradient(#ececec, #dfdfdf);
+	background-image: -o-linear-gradient(#ececec, #dfdfdf);
+	background-image: linear-gradient(#c1d1ef, #a7b5cf);
 }
 
 div.dsbwindow-content {

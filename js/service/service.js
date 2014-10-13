@@ -2,6 +2,9 @@ var http = require("http");
 var url = require("url");
 var fabric = require("./fabric");
 var users = require("./users");
+var projects = require("./projects");
+
+var current_user;
 
 function h_fabrics(query, vars, data, response) {
 	response.write(JSON.stringify(fabric.list()));
@@ -35,6 +38,19 @@ function h_user(query, vars, data, response) {
 	var username = vars[0];
 }
 
+function h_projects(query, vars, data, response) {
+	response.write(JSON.stringify(projects.list()));
+}
+
+function h_project(query, vars, data, response) {
+
+}
+
+function h_project_create(query, vars, data, response) {
+	projects.create(vars[0],query.description,current_user);
+	response.write("true");
+}
+
 /*
  * Provide a list of saved sessions for a given user.
  *    /user/<username>/sessions
@@ -50,6 +66,10 @@ function h_fabric(query, vars, data, response) {
 
 /* All registered service hooks, corresponding to the URL given */
 var hooks = {
+	"projects":		{ hook: h_projects },
+	"project":		{ hook: h_project, vars: 1, children: {
+		"create":	{ hook: h_project_create }
+	}},
 	"fabrics":		{ hook: h_fabrics },
 	"fabric":		{ hook: h_fabric, vars: 1, children: {
 		//"get":		{ hook: h_fabric_get, vars: 2 },
@@ -86,7 +106,7 @@ function start() {
 
 			if (res.success == true) {
 				response.writeHead(200, {
-					"Set-Cookie": "usercode="+res.sessid+"; httponly",
+					"Set-Cookie": "dsbsessid="+res.sessid+"; httponly",
 					"Content-Type": "application/json"
 				});
 
@@ -117,7 +137,33 @@ function start() {
 				});
 				response.write(callback+'({"success": "false", "reason": "'+res.reason+'"});');
 			}
+		} else if (components[1] == "checklogin") {
+			current_sessid = parseCookies(request).dsbsessid;
+
+			response.writeHead(200, {
+				"Content-Type": "application/json"
+			});
+			response.write(callback+"(");
+
+			if (current_sessid === undefined || users.isLoggedIn(current_sessid) == false) {
+					response.write('{"success": "false"}');
+			} else {
+					current_user = users.getName(current_sessid);
+					response.write('{"success": "true", "username": "'+current_user+'"}');
+			}
+
+			response.write(");");
 		} else {
+			current_sessid = parseCookies(request).dsbsessid;
+
+			if (current_sessid === undefined || users.isLoggedIn(current_sessid) == false) {
+				response.writeHead(401, {});
+				response.end();
+				return;
+			}
+
+			current_user = users.getName(current_sessid);
+
 			if (components[1] === undefined) {
 				response.writeHead(404, {});
 			} else {
