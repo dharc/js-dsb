@@ -48,7 +48,7 @@ function h_project(query, vars, data, response) {
 
 function h_project_create(query, vars, data, response) {
 	projects.create(vars[0],query.description,current_user);
-	response.write("true");
+	response.write('{"success": "true"}');
 }
 
 /*

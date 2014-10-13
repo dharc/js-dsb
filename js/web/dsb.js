@@ -20,6 +20,20 @@
 		this.sendCommand("/projects","",cb);
 	};
 
+	DSB.prototype.createProject = function(proname, prodesc, cb) {
+		this.sendCommand("/project/"+proname+"/create?description="+prodesc,undefined, function(data) {
+			if (data === undefined || data.success === undefined) {
+				cb(false,"Unable to contact server");
+			} else {
+				if (data.success == "true") {
+					cb(true,"");
+				} else {
+					cb(false,data.reason);
+				}
+			}
+		});
+	};
+
 	DSB.prototype.getFabrics = function(cb) {
 		this.sendCommand("/fabrics","",cb);
 	};

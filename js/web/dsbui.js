@@ -131,7 +131,7 @@
 		w2popup.open({
 			title: 'Choose Project',
 			body: '<div id="projectGrid" style="height: 300px"></div>',
-			buttons: '<button id="btn_loadproject">Load</button><button class="emph" id="btn_newproject>New</button>',
+			buttons: '<button id="btn_loadproject">Load</button><button class="emph" id="btn_newproject">New</button>',
 			modal: true,
 			width: 500,
 			height: 350,
@@ -143,6 +143,10 @@
 		$('#btn_loadproject').click(function() {
 			w2popup.close();
 			me.setProject('NOPROJECT');
+		});
+
+		$('#btn_newproject').click(function() {
+			me.showCreateProject("New Project");
 		});
 
 		this.dsb.getProjects(function(projects) {
@@ -236,6 +240,54 @@
 				} else {
 					//Oops, try again
 					me.showSignup(reason);
+				}
+			});
+		});
+	};
+
+	/*
+	 * Display a create project popup window.
+	 */
+	DSBUI.prototype.showCreateProject = function(title) {
+		var me = this;
+
+		//Create the popup
+		$('#createprojectpopup').w2popup({
+			title: title,
+			buttons: '<button id="btn_createproject" class="emph">Create</button><button id="btn_procancel">Cancel</button>',
+			modal: true,
+			width: 350,
+			height: 200,
+			showClose: false,
+			keyboard: false
+		});
+
+		//Check the username is alphanumeric and long enough
+		/*$('div#w2ui-popup #dsb_projectname').keyup(function() {
+			if (this.value.search(/^[a-zA-Z0-9]+$/ig) == -1) {
+				$(this).removeClass("valid").addClass("invalid");
+			} else {
+				$(this).removeClass("invalid").addClass("valid");
+			}
+		});*/
+
+		$('#btn_procancel').click(function () {
+			me.showProjects();
+		});
+
+		//When the sign-up button is clicked...
+		$('#btn_createproject').click(function () {
+			var proname = $('div#w2ui-popup #dsb_projectname')[0].value;
+			var prodesc = $('div#w2ui-popup #dsb_projectdesc')[0].value;
+
+			//Send request to server and check result
+			me.dsb.createProject(proname,prodesc, function(success) {
+				if (success == true) {
+					w2popup.close();
+					me.setProject(proname);
+				} else {
+					//Oops
+					//Show error.
 				}
 			});
 		});
