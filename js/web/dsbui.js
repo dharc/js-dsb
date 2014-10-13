@@ -3,6 +3,20 @@
 		this.dsb = dsb;
 	};
 
+	function requestFullScreen(element) {
+		// Supports most browsers and their versions.
+		var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
+
+		if (requestMethod) { // Native full screen.
+		    requestMethod.call(element);
+		} else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+		    var wscript = new ActiveXObject("WScript.Shell");
+		    if (wscript !== null) {
+		        wscript.SendKeys("{F11}");
+		    }
+		}
+	}
+
 	DSBUI.prototype.makeLayout = function() {
 		$('#myLayout').w2layout({
 		    name: 'myLayout',
@@ -24,23 +38,17 @@
 						{ text: 'Change' }
 					]},
 				{ type: 'menu', id: 'viewmenu', caption: 'View', items: [
-						{ text: 'Fullscreen' }
+						{ text: 'Sidebar', id: "itemsb" },
+						{ text: 'Fullscreen', id: "itemfs"},
+						{ text: 'Close All', id: "itemca" }
 					]}
-		        /*{ type: 'check',  id: 'item1', caption: 'Check', img: 'icon-add', checked: true },
-		        { type: 'break' },
-		        { type: 'menu',   id: 'item2', caption: 'Fabric', img: 'icon-folder', 
-		            items: [
-		                { text: 'Connect', img: 'icon-page' }, 
-		                { text: 'Disconnect', img: 'icon-page' }, 
-		                { text: 'Item 3', img: 'icon-page' }
-		            ]
-		        },
-		        { type: 'break' },
-		        { type: 'radio',  id: 'item3',  group: '1', caption: 'Radio 1', img: 'icon-page' },
-		        { type: 'radio',  id: 'item4',  group: '1', caption: 'Radio 2', img: 'icon-page' },
-		        { type: 'spacer' },
-		        { type: 'button',  id: 'item5',  caption: 'Item 5', img: 'icon-save' }*/
-		    ]
+		    ],
+			onClick: function(event) {
+				console.log(event);
+				if (event.target == "viewmenu:itemfs") {
+					requestFullScreen($('#defaultview')[0]);
+				}
+			}
 		});
 	};
 
@@ -88,6 +96,8 @@
 		this.makeToolbar();
 		this.makeSidebar();
 		new DSBWindow({title: "My Workspace"});
+		new DSBWindow({title: "View1"});
+		new DSBWindow({title: "View2"});
 	};
 
 	DSBUI.prototype.showSessions = function() {
