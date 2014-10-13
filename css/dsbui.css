@@ -99,7 +99,7 @@ div#defaultview {
 	padding-top: 100px;
 	color: white;
 	font-family: arial;
-	background-image: url('/images/outlets.png');
+	background-image: url('../images/outlets.png');
 }
 
 input.invalid {
@@ -124,7 +124,7 @@ div#myToolbar {
 
 div#menubottom {
 	z-index: 200;
-	background-image: url('/images/menu-bottomgrad.png');
+	background-image: url('../images/menu-bottomgrad.png');
 	height: 5px;
 	width: 100%;
 	position: absolute;
