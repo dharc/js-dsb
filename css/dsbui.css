@@ -54,6 +54,9 @@ button {
    font-family: Georgia, serif;
    text-decoration: none;
    vertical-align: middle;
+	margin-left: 8px;
+	margin-right: 8px;
+	margin-bottom: 3px;
    }
 
 button:active {
@@ -82,6 +85,8 @@ button.emph {
    font-family: Georgia, serif;
    text-decoration: none;
    vertical-align: middle;
+	/*margin-left: 5px;
+	margin-right: 5px;*/
    }
 
 button.emph:active {

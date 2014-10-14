@@ -1,8 +1,6 @@
-(function (global) {
-	function DSBUI(dsb) {
-		this.dsb = dsb;
-	};
+var dsbui = {};
 
+(function (global) {
 	function requestFullScreen(element) {
 		// Supports most browsers and their versions.
 		var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
@@ -17,7 +15,7 @@
 		}
 	}
 
-	DSBUI.prototype.makeLayout = function() {
+	function makeLayout() {
 		$('#myLayout').w2layout({
 		    name: 'myLayout',
 		    panels: [ 
@@ -26,13 +24,13 @@
 				{ type: 'main', content: "<div id=\"defaultview\"></div>" }
 		    ]
 		});
-	};
+	}
 
-	DSBUI.prototype.makeToolbar = function() {
+	function makeToolbar() {
 		$('#myToolbar').w2toolbar({
 		    name : 'myToolbar',
 		    items: [
-				{ type: 'menu', id: 'projectmenu', caption: 'Project', items: [
+				{ type: 'menu', id: 'projectmenu', caption: dsb.getProjectName(), items: [
 						{ text: 'Hide Side-bar', id: "itemsb" },
 						{ text: 'Full Screen', id: "itemfs"},
 						{ text: 'Close All', id: "itemca" },
@@ -40,7 +38,7 @@
 						{ text: 'Release Mode', id: 'itemrm' }
 					]},
 				{ type: 'spacer' },
-				{ type: 'menu', id: 'usermenu', caption: this.dsb.username, items: [
+				{ type: 'menu', id: 'usermenu', caption: dsb.getUsername(), items: [
 						{ text: 'Switch Project', id: 'userpro' },
 						{ text: 'Preferences', id: 'userpref' },
 						{ text: 'Log Out', id: 'userlogout' }
@@ -53,9 +51,9 @@
 				}
 			}
 		});
-	};
+	}
 
-	DSBUI.prototype.makeSidebar = function() {
+	function makeSidebar() {
 		$('#mySidebar').w2sidebar({
 		    name  : 'mySidebar',
 		    img   : null,
@@ -111,27 +109,25 @@
 		        console.log(event.target);
 		    }
 		});
-	};
+	}
 
 	/*
 	 * A project has been selected so configure the screen.
 	 */
-	DSBUI.prototype.setProject = function(proname) {
-		this.makeLayout();
-		this.makeToolbar();
-		this.makeSidebar();
+	function setProject(proname) {
+		dsb.setProject(proname);
+		makeLayout();
+		makeToolbar();
+		makeSidebar();
 		new DSBWindow({title: "My Workspace", type: "workspace"});
 		new DSBWindow({title: "View1"});
-		new DSBWindow({title: "View2"});
-	};
+	}
 
-	DSBUI.prototype.showProjects = function() {
-		var me = this;
-
+	function showProjects() {
 		w2popup.open({
 			title: 'Choose Project',
 			body: '<div id="projectGrid" style="height: 300px"></div>',
-			buttons: '<button id="btn_loadproject">Load</button><button class="emph" id="btn_newproject">New</button>',
+			buttons: '<button class="emph" id="btn_playproject">Play</button><button id="btn_loadproject">Edit</button><button id="btn_newproject">New</button>',
 			modal: true,
 			width: 500,
 			height: 350,
@@ -142,19 +138,19 @@
 
 		$('#btn_loadproject').click(function() {
 			w2popup.close();
-			me.setProject('NOPROJECT');
+			setProject(w2ui['projectGrid'].getSelection()[0]);
 		});
 
 		$('#btn_newproject').click(function() {
-			me.showCreateProject("New Project");
+			showCreateProject("New Project");
 		});
 
-		this.dsb.getProjects(function(projects) {
+		dsb.getProjects(function(projects) {
 			var items = [];
 			var i;
 
-			for (i=0; i<projects.length; i++) {
-				items.push({recid: i+1, sname: projects[i].name, sdesc: projects[i].description, sdate: projects[i].created});
+			for (x in projects) {
+				items.push({recid: x, sname: projects[x].name, sdesc: projects[x].description, sdate: projects[x].created});
 			}
 
 			w2popup.unlock();
@@ -168,14 +164,12 @@
 				records: items
 			});
 		});
-	};
+	}
 
 	/*
 	 * Display a signup popup window with a signup button.
 	 */
-	DSBUI.prototype.showSignup = function(title) {
-		var me = this;
-
+	function showSignup(title) {
 		//Create the popup
 		$('#signuppopup').w2popup({
 			title: title,
@@ -234,12 +228,12 @@
 			var last = $('div#w2ui-popup #dsb_slast')[0].value;
 
 			//Send request to server and check result
-			me.dsb.signup(username,password,email,first,last, function(success,reason) {
+			dsb.signup(username,password,email,first,last, function(success,reason) {
 				if (success == true) {
-					me.showLogin("Sign-up Complete");
+					showLogin("Sign-up Complete");
 				} else {
 					//Oops, try again
-					me.showSignup(reason);
+					showSignup(reason);
 				}
 			});
 		});
@@ -248,9 +242,7 @@
 	/*
 	 * Display a create project popup window.
 	 */
-	DSBUI.prototype.showCreateProject = function(title) {
-		var me = this;
-
+	function showCreateProject(title) {
 		//Create the popup
 		$('#createprojectpopup').w2popup({
 			title: title,
@@ -262,17 +254,17 @@
 			keyboard: false
 		});
 
-		//Check the username is alphanumeric and long enough
-		/*$('div#w2ui-popup #dsb_projectname').keyup(function() {
-			if (this.value.search(/^[a-zA-Z0-9]+$/ig) == -1) {
+		//Check the project name is long enough
+		$('div#w2ui-popup #dsb_projectname').keyup(function() {
+			if (this.value.length < 6) {
 				$(this).removeClass("valid").addClass("invalid");
 			} else {
 				$(this).removeClass("invalid").addClass("valid");
 			}
-		});*/
+		});
 
 		$('#btn_procancel').click(function () {
-			me.showProjects();
+			showProjects();
 		});
 
 		//When the sign-up button is clicked...
@@ -281,10 +273,10 @@
 			var prodesc = $('div#w2ui-popup #dsb_projectdesc')[0].value;
 
 			//Send request to server and check result
-			me.dsb.createProject(proname,prodesc, function(success) {
+			dsb.createProject(proname,prodesc, function(success,reason,projid) {
 				if (success == true) {
 					w2popup.close();
-					me.setProject(proname);
+					setProject(projid);
 				} else {
 					//Oops
 					//Show error.
@@ -293,9 +285,7 @@
 		});
 	};
 
-	DSBUI.prototype.showLogin = function(title) {
-		var me = this;
-
+	function showLogin(title) {
 		$('#loginpopup').w2popup({
 			title: title,
 			buttons: '<button id="btn_login">Login</button><button id="btn_signup1" class="emph">Sign-up</button>',
@@ -312,28 +302,22 @@
 
 			//Do some validation checks before sending to server...
 
-			me.dsb.login(username,password, function(success,reason) {
+			dsb.login(username,password, function(success,reason) {
 				if (success == true) {
-					me.showProjects();
+					showProjects();
 				} else {
-					me.showLogin(reason);
+					showLogin(reason);
 				}
 			});
 		});
 
 		$('#btn_signup1').click(function() {
-			me.showSignup("Sign-up");
-		});
-	};
-
-	DSBUI.prototype.updateFabrics = function() {
-		this.dsb.getFabrics(function (data) {
-				document.getElementById('casmoutput').innerHTML = JSON.stringify(data);
-				console.log(data);
+			showSignup("Sign-up");
 		});
 	};
 
 	// expose API
-	global.DSBUI = DSBUI;
-}(typeof window !== 'undefined' ? window : global));
+	global.showLogin = showLogin;
+	global.showProjects = showProjects;
+}(typeof dsbui !== 'undefined' ? dsbui : global));
 

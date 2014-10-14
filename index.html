@@ -34,7 +34,7 @@
 
 	<div id="createprojectpopup" style="display: none;">
 		<div class="loginform">
-		<div class="loginlabel">Name:</div> <input class="login" id="dsb_projectname" type="text"><br/>
+		<div class="loginlabel">Name:<span class="required">*</span></div> <input class="login" id="dsb_projectname" type="text"><br/>
 		<div class="loginlabel">Description:</div> <input id="dsb_projectdesc" type="text">
 		</div>
 	</div>
@@ -42,13 +42,7 @@
     <div id="myLayout"></div>
 </body>
 <script>
-var dsb;
-var dsbui;
-
 $(function () {
-	dsb = new DSB();
-	dsbui = new DSBUI(dsb);
-
 	dsb.checkLogin(function(username) {
 		if (username === undefined) {
 			dsbui.showLogin("Login");
