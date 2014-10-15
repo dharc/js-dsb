@@ -53,58 +53,37 @@ var dsbui = {};
 		});
 	}
 
-	function makeSidebar() {
+	function makeSidebar(prodata) {
+		var mainnodes = [];
+		var nodel1;
+		var nodel2;
+		var nodel3;
+		var nodel4;
+		var nodel5;
+		var i;
+		var j;
+
+		nodel1 = { id: 'project-level', text: prodata.name, img: 'icon-folder', expanded: true, nodes: [] };
+		nodel2 = { id: 'fabric-level', text: "Fabrics", img: 'icon-folder', nodes: [] };
+		nodel1.nodes.push(nodel2);
+
+		for (i=0; i<prodata.fabrics.length; i++) {
+			nodel3 = { id: 'fabric-'+i, text: prodata.fabrics[i].name, img: 'icon-folder', nodes: [] };
+			nodel4 = { id: 'fabric-'+i+'handles', text: "Handles", img: 'icon-folder', nodes: [] };
+			for (j=0; j<prodata.fabrics[i].handles.length; j++) {
+				nodel5 = { id: 'fabric-'+i+'handle-'+j, text: prodata.fabrics[i].handles[j], img: 'icon-page' };
+				nodel4.nodes.push(nodel5);
+			}
+			nodel3.nodes.push(nodel4);
+		}
+		nodel2.nodes.push(nodel3);
+
+		mainnodes.push(nodel1);
+
 		$('#mySidebar').w2sidebar({
 		    name  : 'mySidebar',
 		    img   : null,
-		    nodes : [ 
-		        { id: 'level-1', text: 'Project', img: 'icon-folder', expanded: true, 
-		            nodes: [
-						{ id: 'fabrics', text: 'Fabrics', img: 'icon-folder',
-							nodes: [
-								{ id: 'fab1', text: 'Model', img: 'icon-page' },
-								{ id: 'fab2', text: 'View1', img: 'icon-page' }
-							]},
-		                { id: 'workspaces', text: 'Workspaces', img: 'icon-folder',
-							nodes: [
-								{ id: 'work1', text: 'Myspace 1', img: 'icon-page' }
-							]},
-		                { id: 'views', text: 'Views', img: 'icon-folder',
-							nodes: [
-								{ id: 'view1', text: 'Default View', img: 'icon-page',
-									nodes: [
-										{ id: 'view1_oracles', text: 'Oracles', img: 'icon-page' },
-										{ id: 'view1_handles', text: 'Handles', img: 'icon-page' },
-										{ id: 'view1_actions', text: 'Actions', img: 'icon-page' }
-								]}
-							]},
-						{ id: 'layouts', text: 'Layouts', img: 'icon-folder',
-							nodes: [
-								{ id: 'layout1', text: 'Initial Layout', img: 'icon-page' }
-							]}
-		             ]
-		        },
-		        { id: 'level-2', text: 'Component Library', img: 'icon-folder',
-		            nodes: [ 
-		                { id: 'level-2-1', text: 'Level 2.1', img: 'icon-folder', 
-		                    nodes: [
-		                        { id: 'level-2-1-1', text: 'Level 2.1.1', img: 'icon-page' },
-		                        { id: 'level-2-1-2', text: 'Level 2.1.2', img: 'icon-page' },
-		                        { id: 'level-2-1-3', text: 'Level 2.1.3', img: 'icon-page' }
-		                     ]
-		                 },
-		                { id: 'level-2-2', text: 'Level 2.2', img: 'icon-page' },
-		                { id: 'level-2-3', text: 'Level 2.3', img: 'icon-page' }
-		            ]
-		        },
-		        { id: 'level-3', text: 'Workspace Library', img: 'icon-folder',
-		            nodes: [
-		                { id: 'level-3-1', text: 'Level 3.1', img: 'icon-page' },
-		                { id: 'level-3-2', text: 'Level 3.2', img: 'icon-page' },
-		                { id: 'level-3-3', text: 'Level 3.3', img: 'icon-page' }
-		            ]
-		        }
-		    ],
+		    nodes : mainnodes,
 		    onClick: function (event) {
 		        console.log(event.target);
 		    }
@@ -112,15 +91,17 @@ var dsbui = {};
 	}
 
 	/*
-	 * A project has been selected so configure the screen.
+	 * A project has been selected so download project data and then
+	 * configure the screen.
 	 */
 	function setProject(proname) {
-		dsb.setProject(proname);
-		makeLayout();
-		makeToolbar();
-		makeSidebar();
-		new DSBWindow({title: "My Workspace", type: "workspace"});
-		new DSBWindow({title: "View1"});
+		dsb.setProject(proname, function(prodata) {
+			makeLayout();
+			makeToolbar();
+			makeSidebar(prodata);
+			new DSBWindow({title: "My Workspace", type: "workspace"});
+			new DSBWindow({title: "View1"});
+		});
 	}
 
 	function showProjects() {

@@ -13,12 +13,23 @@ function Project(name, description, author) {
 	this.workspaces = {};
 }
 
+Project.prototype.details = function() {
+	return {
+		name: this.name,
+		description: this.description,
+		created: this.created,
+		author: this.author,
+		fabrics: this.listFabrics()
+	};
+};
+
 Project.prototype.addFabric = function (name, fab) {
 	this.fabrics[name] = fab;
 };
 
 Project.prototype.listFabrics = function() {
 	var res = [];
+	var x;
 	for (x in this.fabrics) {
 		res.push({
 			name: x,
@@ -43,6 +54,7 @@ function get(projid) {
 
 function list() {
 	var res = {};
+	var x;
 	for (x in projects) {
 		res[x] = {
 			name: projects[x].name,

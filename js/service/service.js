@@ -33,7 +33,12 @@ function h_projects(query, vars, data, response) {
 }
 
 function h_project(query, vars, data, response) {
-
+	var pro = projects.get(vars[0]);
+	if (pro === undefined) {
+		response.write("false");
+		return;
+	}
+	response.write(JSON.stringify(pro.details()));
 }
 
 /*

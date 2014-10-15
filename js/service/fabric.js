@@ -125,6 +125,7 @@ Fabric.prototype.createHandle = function(name, rela, relb) {
 
 Fabric.prototype.listOracles = function() {
 	var res = [];
+	var x;
 	for (x in this.oracles) {
 		res.push(x);
 	}
@@ -133,6 +134,7 @@ Fabric.prototype.listOracles = function() {
 
 Fabric.prototype.listHandles = function() {
 	var res = [];
+	var x;
 	for (x in this.handles) {
 		res.push(x);
 	}
@@ -151,6 +153,7 @@ Fabric.prototype.query = function (a,n) {
 	var node = this.relations[a];
 	var count = n;
 	var res = new Array();
+	var x;
 	
 	for (x in node) {
 		res.push(x);
@@ -191,6 +194,7 @@ Fabric.prototype.set = function(a,b,c) {
 
 function list() {
 	var res = [];
+	var x;
 	for (x in fabrics)
 	{
 		res.push(x);

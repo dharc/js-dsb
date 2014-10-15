@@ -41,8 +41,14 @@ var dsb = {};
 		});
 	}
 
-	function setProject(projid) {
-		project = projects[projid];
+	function setProject(projid, cb) {
+		//project = projects[projid];
+		sendCommand(
+		 "/project/"+projid,
+		 {}, undefined, function(data) {
+			project = data;
+			cb(data);
+		});
 	}
 
 	function createProject(proname, prodesc, cb) {
