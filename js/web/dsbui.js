@@ -30,7 +30,7 @@ var dsbui = {};
 		$('#myToolbar').w2toolbar({
 		    name : 'myToolbar',
 		    items: [
-				{ type: 'menu', id: 'projectmenu', caption: dsb.getProjectName(), items: [
+				{ type: 'menu', id: 'projectmenu', caption: '<span class="icon-notebook"></span>&nbsp;'+dsb.getProjectName(), items: [
 						{ text: 'Hide Side-bar', id: "itemsb" },
 						{ text: 'Full Screen', id: "itemfs"},
 						{ text: 'Close All', id: "itemca" },
@@ -38,10 +38,10 @@ var dsbui = {};
 						{ text: 'Release Mode', id: 'itemrm' }
 					]},
 				{ type: 'spacer' },
-				{ type: 'menu', id: 'usermenu', caption: dsb.getUsername(), items: [
-						{ text: 'Switch Project', id: 'userpro' },
-						{ text: 'Preferences', id: 'userpref' },
-						{ text: 'Log Out', id: 'userlogout' }
+				{ type: 'menu', id: 'usermenu', caption: '<span class="icon-user"></span>&nbsp;'+dsb.getUsername(), items: [
+						{ text: '<span class="icon-books"></span>&nbsp;Switch Project', id: 'userpro' },
+						{ text: '<span class="icon-cog"></span>&nbsp;Preferences', id: 'userpref' },
+						{ text: '<span class="icon-switch"></span>&nbsp;Log Out', id: 'userlogout' }
 					]}
 		    ],
 			onClick: function(event) {
@@ -68,15 +68,15 @@ var dsbui = {};
 		nodel1.nodes.push(nodel2);
 
 		for (i=0; i<prodata.fabrics.length; i++) {
-			nodel3 = { id: 'fabric-'+i, text: prodata.fabrics[i].name, img: 'icon-folder', nodes: [] };
+			nodel3 = { id: 'fabric-'+i, text: prodata.fabrics[i].name, img: 'icon-cloud', nodes: [] };
 			nodel4 = { id: 'fabric-'+i+'handles', text: "Handles", img: 'icon-folder', nodes: [] };
 			for (j=0; j<prodata.fabrics[i].handles.length; j++) {
 				nodel5 = { id: 'fabric-'+i+'handle-'+j, text: prodata.fabrics[i].handles[j], img: 'icon-page' };
 				nodel4.nodes.push(nodel5);
 			}
 			nodel3.nodes.push(nodel4);
+			nodel2.nodes.push(nodel3);
 		}
-		nodel2.nodes.push(nodel3);
 
 		mainnodes.push(nodel1);
 
@@ -106,9 +106,9 @@ var dsbui = {};
 
 	function showProjects() {
 		w2popup.open({
-			title: 'Choose Project',
+			title: '<span class="icon-books"></span>&nbsp;'+'Choose Project',
 			body: '<div id="projectGrid" style="height: 300px"></div>',
-			buttons: '<button class="emph" id="btn_playproject">Play</button><button id="btn_loadproject">Edit</button><button id="btn_newproject">New</button>',
+			buttons: '<button class="emph" id="btn_playproject"><span class="icon-play2"></span>&nbsp;&nbsp;Play</button><button id="btn_loadproject"><span class="icon-pencil"></span>&nbsp;&nbsp;Edit</button><button id="btn_newproject"><span class="icon-plus"></span>&nbsp;&nbsp;New</button>',
 			modal: true,
 			width: 500,
 			height: 350,
@@ -153,7 +153,7 @@ var dsbui = {};
 	function showSignup(title) {
 		//Create the popup
 		$('#signuppopup').w2popup({
-			title: title,
+			title: '<span class="icon-users"></span>&nbsp;'+title,
 			buttons: '<button id="btn_signup2" class="emph">Sign-up</button>',
 			modal: true,
 			width: 350,
@@ -226,7 +226,7 @@ var dsbui = {};
 	function showCreateProject(title) {
 		//Create the popup
 		$('#createprojectpopup').w2popup({
-			title: title,
+			title: '<span class="icon-notebook"></span>&nbsp;'+title,
 			buttons: '<button id="btn_createproject" class="emph">Create</button><button id="btn_procancel">Cancel</button>',
 			modal: true,
 			width: 350,
@@ -268,7 +268,7 @@ var dsbui = {};
 
 	function showLogin(title) {
 		$('#loginpopup').w2popup({
-			title: title,
+			title: '<span class="icon-users"></span>&nbsp;'+title,
 			buttons: '<button id="btn_login">Login</button><button id="btn_signup1" class="emph">Sign-up</button>',
 			modal: true,
 			width: 350,

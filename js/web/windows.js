@@ -53,13 +53,13 @@
 
 		titlebar = jQuery('<div/>', {
 			class: "dsbwindow-title",
-			html: "<table class=\"dsbtitlemenu\" cellpadding=\"1\" cellspacing=\"0\"><tr><td class=\"w2ui-tb-caption\" nowrap>"+options.title+"&nbsp;&nbsp;</td><td class=\"w2ui-tb-down\" nowrap><div class=\"dsbdown\"></div></td></tr></table>"
+			html: "<table class=\"dsbtitlemenu\" cellpadding=\"1\" cellspacing=\"0\"><tr><td class=\"w2ui-tb-caption\" nowrap>"+'<span class="icon-eye"></span>&nbsp;&nbsp;&nbsp;'+options.title+"&nbsp;&nbsp;</td><td class=\"w2ui-tb-down\" nowrap><div class=\"dsbdown\"></div></td></tr></table>"
 		});
-		if (options.type == "view") {
+		/*if (options.type == "view") {
 			titlebar.addClass("dsbwindow-VIEW");
 		} else if (options.type == "workspace") {
 			titlebar.addClass("dsbwindow-WORK");
-		}
+		}*/
 
 		var titbut = titlebar.find(".dsbtitlemenu");
 
