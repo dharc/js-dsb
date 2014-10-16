@@ -53,8 +53,34 @@
 
 		titlebar = jQuery('<div/>', {
 			class: "dsbwindow-title",
-			html: "<table cellpadding=\"1\" cellspacing=\"0\"><tr><td class=\"w2ui-tb-caption\" nowrap>"+options.title+"</td><td class=\"w2ui-tb-down\" nowrap><div class=\"dsbdown\"></div></td></tr></table>"
+			html: "<table class=\"dsbtitlemenu\" cellpadding=\"1\" cellspacing=\"0\"><tr><td class=\"w2ui-tb-caption\" nowrap>"+'<span class="icon-eye"></span>&nbsp;&nbsp;&nbsp;'+options.title+"&nbsp;&nbsp;</td><td class=\"w2ui-tb-down\" nowrap><div class=\"dsbdown\"></div></td></tr></table>"
 		});
+		/*if (options.type == "view") {
+			titlebar.addClass("dsbwindow-VIEW");
+		} else if (options.type == "workspace") {
+			titlebar.addClass("dsbwindow-WORK");
+		}*/
+
+		var titbut = titlebar.find(".dsbtitlemenu");
+
+		titbut.click(function(e) {
+			$(this).w2menu({
+				items: [
+					{ id: 1, text: "Maximize" },
+					{ id: 2, text: "Close" }
+				]
+			});
+		});
+		titbut.mouseenter(function() {
+			$(this).addClass("dsbhover");
+		});
+		titbut.mouseleave(function() {
+			$(this).removeClass("dsbhover");
+		});
+		titbut.mousedown(function(e) {
+			e.stopPropagation();
+		});
+		titbut.css("cursor","default");
 
 		outer = jQuery('<div/>', {
 			class: "dsbwindow-outer"

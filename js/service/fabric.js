@@ -1,3 +1,5 @@
+var crypto = require('crypto');
+
 var fabrics = {};
 
 function Relation(a,b) {
@@ -41,18 +43,117 @@ Relation.prototype.setvalue = function(value) {
 	this.outofdate = false;
 }
 
-function Fabric(name, descr) {
-	this.name = name;
-	this.description = descr;
-	this.relations = {};
-	
-	fabrics[name] = this;
+
+/* ========== Handle ========== */
+
+function Handle(fabric, rela, relb) {
+	this.fabric = fabric;
+	this.rela = rela;
+	this.relb = relb;
+	this.oracles = [];
+	//Add trigger
 }
+
+Handle.prototype.addOracle = function(oracle) {
+	this.oracles.push(oracle);
+};
+
+Handle.prototype.notify = function(value) {
+	var i;
+	for (i=0; i<this.oracles.length; i++) {
+		this.oracles[i].notify(value);
+	}
+};
+
+/* ========== Oracle ========== */
+
+function Oracle(fabric, rela, relb) {
+	this.fabric = fabric;
+	this.rela = rela;
+	this.relb = relb;
+	this.handles = [];
+}
+
+Oracle.prototype.addHandle = function(handle) {
+	this.handles.push(handle);
+};
+
+Oracle.prototype.notify = function(value) {
+	this.fabric.set(this.rela,this.relb,value);
+};
+
+
+/* ========== Fabric ========== */
+
+function Fabric(id, ssf) {
+	this.id = id;
+	this.relations = {};
+	this.handles = {};
+	this.oracles = {};
+	this.serverside = ssf;
+	this.firstfree = [100,0];
+}
+
+Fabric.prototype.createNode = function() {
+	//Return a new node id
+	return "0:0";
+};
+
+Fabric.prototype.createOracle = function(name, rela, relb) {
+	var prela = rela;
+	var prelb = relb;
+	if (prela === undefined) {
+		prela = this.createNode();
+	}
+	if (prelb === undefined) {
+		prelb = this.createNode();
+	}
+	this.oracles[name] = new Oracle(this, prela, prelb);
+};
+
+Fabric.prototype.createHandle = function(name, rela, relb) {
+	var prela = rela;
+	var prelb = relb;
+	if (prela === undefined) {
+		prela = this.createNode();
+	}
+	if (prelb === undefined) {
+		prelb = this.createNode();
+	}
+	this.handles[name] = new Handle(this, prela, prelb);
+};
+
+Fabric.prototype.listOracles = function() {
+	var res = [];
+	var x;
+	for (x in this.oracles) {
+		res.push(x);
+	}
+	return res;
+};
+
+Fabric.prototype.listHandles = function() {
+	var res = [];
+	var x;
+	for (x in this.handles) {
+		res.push(x);
+	}
+	return res;
+};
+
+Fabric.prototype.getHandle = function(name) {
+	return this.handles[name];
+};
+
+Fabric.prototype.getOracle = function(name) {
+	return this.oracles[name];
+};
 
 Fabric.prototype.query = function (a,n) {
 	var node = this.relations[a];
 	var count = n;
 	var res = new Array();
+	var x;
 	
 	for (x in node) {
 		res.push(x);
@@ -92,22 +193,33 @@ Fabric.prototype.set = function(a,b,c) {
 }
 
 function list() {
-	var res = {};
+	var res = [];
+	var x;
 	for (x in fabrics)
 	{
-		res[x] = fabrics[x].description;
+		res.push(x);
 	}
 	return res;
 }
 
-function get(name) {
-	return fabrics[name];
+function get(fabid) {
+	return fabrics[fabid];
 }
 
-function create(name,descr) {
-	new Fabric(name,descr);
+function create() {
+	var fabid;
+	fabid = "f"+crypto.randomBytes(8).toString('hex');
+	fabrics[fabid] = new Fabric(fabid);
+	return fabid;
 }
 
-exports.Fabric = Fabric;
+function connect(handle, oracle) {
+	handle.addOracle(oracle);
+	oracle.addHandle(handle);
+}
+
+//exports.Fabric = Fabric;
 exports.list = list;
 exports.get = get;
+exports.create = create;
+exports.connect = connect;

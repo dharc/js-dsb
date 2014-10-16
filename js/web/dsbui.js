@@ -1,8 +1,6 @@
-(function (global) {
-	function DSBUI(dsb) {
-		this.dsb = dsb;
-	};
+var dsbui = {};
 
+(function (global) {
 	function requestFullScreen(element) {
 		// Supports most browsers and their versions.
 		var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
@@ -17,7 +15,7 @@
 		}
 	}
 
-	DSBUI.prototype.makeLayout = function() {
+	function makeLayout() {
 		$('#myLayout').w2layout({
 		    name: 'myLayout',
 		    panels: [ 
@@ -26,21 +24,24 @@
 				{ type: 'main', content: "<div id=\"defaultview\"></div>" }
 		    ]
 		});
-	};
+	}
 
-	DSBUI.prototype.makeToolbar = function() {
+	function makeToolbar() {
 		$('#myToolbar').w2toolbar({
 		    name : 'myToolbar',
 		    items: [
-				{ type: 'menu', id: 'sessionmenu', caption: 'Session', items: [
-						{ text: 'New' },
-						{ text: 'Save' },
-						{ text: 'Change' }
+				{ type: 'menu', id: 'projectmenu', caption: '<span class="icon-notebook"></span>&nbsp;'+dsb.getProjectName(), items: [
+						{ text: 'Hide Side-bar', id: "itemsb" },
+						{ text: 'Full Screen', id: "itemfs"},
+						{ text: 'Close All', id: "itemca" },
+						{ text: 'Project Properties', id: 'itempp' },
+						{ text: 'Release Mode', id: 'itemrm' }
 					]},
-				{ type: 'menu', id: 'viewmenu', caption: 'View', items: [
-						{ text: 'Sidebar', id: "itemsb" },
-						{ text: 'Fullscreen', id: "itemfs"},
-						{ text: 'Close All', id: "itemca" }
+				{ type: 'spacer' },
+				{ type: 'menu', id: 'usermenu', caption: '<span class="icon-user"></span>&nbsp;'+dsb.getUsername(), items: [
+						{ text: '<span class="icon-books"></span>&nbsp;Switch Project', id: 'userpro' },
+						{ text: '<span class="icon-cog"></span>&nbsp;Preferences', id: 'userpref' },
+						{ text: '<span class="icon-switch"></span>&nbsp;Log Out', id: 'userlogout' }
 					]}
 		    ],
 			onClick: function(event) {
@@ -50,82 +51,92 @@
 				}
 			}
 		});
-	};
+	}
 
-	DSBUI.prototype.makeSidebar = function() {
+	function makeSidebar(prodata) {
+		var mainnodes = [];
+		var nodel1;
+		var nodel2;
+		var nodel3;
+		var nodel4;
+		var nodel5;
+		var i;
+		var j;
+
+		nodel1 = { id: 'project-level', text: prodata.name, img: 'icon-folder', expanded: true, nodes: [] };
+		nodel2 = { id: 'fabric-level', text: "Fabrics", img: 'icon-folder', nodes: [] };
+		nodel1.nodes.push(nodel2);
+
+		for (i=0; i<prodata.fabrics.length; i++) {
+			nodel3 = { id: 'fabric-'+i, text: prodata.fabrics[i].name, img: 'icon-cloud', nodes: [] };
+			nodel4 = { id: 'fabric-'+i+'handles', text: "Handles", img: 'icon-folder', nodes: [] };
+			for (j=0; j<prodata.fabrics[i].handles.length; j++) {
+				nodel5 = { id: 'fabric-'+i+'handle-'+j, text: prodata.fabrics[i].handles[j], img: 'icon-page' };
+				nodel4.nodes.push(nodel5);
+			}
+			nodel3.nodes.push(nodel4);
+			nodel2.nodes.push(nodel3);
+		}
+
+		mainnodes.push(nodel1);
+
 		$('#mySidebar').w2sidebar({
 		    name  : 'mySidebar',
 		    img   : null,
-		    nodes : [ 
-		        { id: 'level-1', text: 'Workspaces', img: 'icon-folder', expanded: true, 
-		            nodes: [ 
-		                { id: 'level-1-1', text: 'My agent 1', img: 'icon-page' },
-		                { id: 'level-1-2', text: 'Auto Agent 1', img: 'icon-page' }
-		             ]
-		        },
-		        { id: 'level-2', text: 'Views', img: 'icon-folder',
-		            nodes: [ 
-		                { id: 'level-2-1', text: 'Level 2.1', img: 'icon-folder', 
-		                    nodes: [
-		                        { id: 'level-2-1-1', text: 'Level 2.1.1', img: 'icon-page' },
-		                        { id: 'level-2-1-2', text: 'Level 2.1.2', img: 'icon-page' },
-		                        { id: 'level-2-1-3', text: 'Level 2.1.3', img: 'icon-page' }
-		                     ]
-		                 },
-		                { id: 'level-2-2', text: 'Level 2.2', img: 'icon-page' },
-		                { id: 'level-2-3', text: 'Level 2.3', img: 'icon-page' }
-		            ]
-		        },
-		        { id: 'level-3', text: 'Controls', img: 'icon-folder',
-		            nodes: [
-		                { id: 'level-3-1', text: 'Level 3.1', img: 'icon-page' },
-		                { id: 'level-3-2', text: 'Level 3.2', img: 'icon-page' },
-		                { id: 'level-3-3', text: 'Level 3.3', img: 'icon-page' }
-		            ]
-		        }
-		    ],
+		    nodes : mainnodes,
 		    onClick: function (event) {
 		        console.log(event.target);
 		    }
 		});
-	};
+	}
 
-	DSBUI.prototype.session = function() {
-		w2popup.close();
-		this.makeLayout();
-		this.makeToolbar();
-		this.makeSidebar();
-		new DSBWindow({title: "My Workspace"});
-		new DSBWindow({title: "View1"});
-		new DSBWindow({title: "View2"});
-	};
+	/*
+	 * A project has been selected so download project data and then
+	 * configure the screen.
+	 */
+	function setProject(proname) {
+		dsb.setProject(proname, function(prodata) {
+			makeLayout();
+			makeToolbar();
+			makeSidebar(prodata);
+			new DSBWindow({title: "My Workspace", type: "workspace"});
+			new DSBWindow({title: "View1"});
+		});
+	}
 
-	DSBUI.prototype.showSessions = function() {
-		var me = this;
-
+	function showProjects() {
 		w2popup.open({
-			title: 'Choose Session',
-			body: '<div id="sessionGrid" style="height: 300px"></div>',
-			buttons: '<button onclick="dsbui.session();">Load</button><button class="emph">New</button>',
+			title: '<span class="icon-books"></span>&nbsp;'+'Choose Project',
+			body: '<div id="projectGrid" style="height: 300px"></div>',
+			buttons: '<button class="emph" id="btn_playproject"><span class="icon-play2"></span>&nbsp;&nbsp;Play</button><button id="btn_loadproject"><span class="icon-pencil"></span>&nbsp;&nbsp;Edit</button><button id="btn_newproject"><span class="icon-plus"></span>&nbsp;&nbsp;New</button>',
 			modal: true,
-			width: 400,
+			width: 500,
 			height: 350,
 			showClose: false,
 			keyboard: false
 		});
 		w2popup.lock('',true);
 
-		this.dsb.getSessions(function(sessions) {
+		$('#btn_loadproject').click(function() {
+			w2popup.close();
+			setProject(w2ui['projectGrid'].getSelection()[0]);
+		});
+
+		$('#btn_newproject').click(function() {
+			showCreateProject("New Project");
+		});
+
+		dsb.getProjects(function(projects) {
 			var items = [];
 			var i;
 
-			for (i=0; i<sessions.length; i++) {
-				items.push({recid: i+1, sname: sessions[i].name, sdesc: '', sdate: ''});
+			for (x in projects) {
+				items.push({recid: x, sname: projects[x].name, sdesc: projects[x].description, sdate: projects[x].created});
 			}
 
 			w2popup.unlock();
-			$('#sessionGrid').w2grid({ 
-				name   : 'sessionGrid', 
+			$('#projectGrid').w2grid({ 
+				name   : 'projectGrid', 
 				columns: [                
 					{ field: 'sname', caption: 'Name', size: '40%' },
 					{ field: 'sdesc', caption: 'Description', size: '50%' },
@@ -134,17 +145,15 @@
 				records: items
 			});
 		});
-	};
+	}
 
 	/*
 	 * Display a signup popup window with a signup button.
 	 */
-	DSBUI.prototype.showSignup = function(title) {
-		var me = this;
-
+	function showSignup(title) {
 		//Create the popup
 		$('#signuppopup').w2popup({
-			title: title,
+			title: '<span class="icon-users"></span>&nbsp;'+title,
 			buttons: '<button id="btn_signup2" class="emph">Sign-up</button>',
 			modal: true,
 			width: 350,
@@ -200,22 +209,66 @@
 			var last = $('div#w2ui-popup #dsb_slast')[0].value;
 
 			//Send request to server and check result
-			me.dsb.signup(username,password,email,first,last, function(success,reason) {
+			dsb.signup(username,password,email,first,last, function(success,reason) {
 				if (success == true) {
-					me.showLogin("Sign-up Complete");
+					showLogin("Sign-up Complete");
 				} else {
 					//Oops, try again
-					me.showSignup(reason);
+					showSignup(reason);
 				}
 			});
 		});
 	};
 
-	DSBUI.prototype.showLogin = function(title) {
-		var me = this;
+	/*
+	 * Display a create project popup window.
+	 */
+	function showCreateProject(title) {
+		//Create the popup
+		$('#createprojectpopup').w2popup({
+			title: '<span class="icon-notebook"></span>&nbsp;'+title,
+			buttons: '<button id="btn_createproject" class="emph">Create</button><button id="btn_procancel">Cancel</button>',
+			modal: true,
+			width: 350,
+			height: 200,
+			showClose: false,
+			keyboard: false
+		});
 
+		//Check the project name is long enough
+		$('div#w2ui-popup #dsb_projectname').keyup(function() {
+			if (this.value.length < 6) {
+				$(this).removeClass("valid").addClass("invalid");
+			} else {
+				$(this).removeClass("invalid").addClass("valid");
+			}
+		});
+
+		$('#btn_procancel').click(function () {
+			showProjects();
+		});
+
+		//When the sign-up button is clicked...
+		$('#btn_createproject').click(function () {
+			var proname = $('div#w2ui-popup #dsb_projectname')[0].value;
+			var prodesc = $('div#w2ui-popup #dsb_projectdesc')[0].value;
+
+			//Send request to server and check result
+			dsb.createProject(proname,prodesc, function(success,reason,projid) {
+				if (success == true) {
+					w2popup.close();
+					setProject(projid);
+				} else {
+					//Oops
+					//Show error.
+				}
+			});
+		});
+	};
+
+	function showLogin(title) {
 		$('#loginpopup').w2popup({
-			title: title,
+			title: '<span class="icon-users"></span>&nbsp;'+title,
 			buttons: '<button id="btn_login">Login</button><button id="btn_signup1" class="emph">Sign-up</button>',
 			modal: true,
 			width: 350,
@@ -230,28 +283,22 @@
 
 			//Do some validation checks before sending to server...
 
-			me.dsb.login(username,password, function(success,reason) {
+			dsb.login(username,password, function(success,reason) {
 				if (success == true) {
-					me.showSessions();
+					showProjects();
 				} else {
-					me.showLogin(reason);
+					showLogin(reason);
 				}
 			});
 		});
 
 		$('#btn_signup1').click(function() {
-			me.showSignup("Sign-up");
-		});
-	};
-
-	DSBUI.prototype.updateFabrics = function() {
-		this.dsb.getFabrics(function (data) {
-				document.getElementById('casmoutput').innerHTML = JSON.stringify(data);
-				console.log(data);
+			showSignup("Sign-up");
 		});
 	};
 
 	// expose API
-	global.DSBUI = DSBUI;
-}(typeof window !== 'undefined' ? window : global));
+	global.showLogin = showLogin;
+	global.showProjects = showProjects;
+}(typeof dsbui !== 'undefined' ? dsbui : global));
 

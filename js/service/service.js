@@ -2,64 +2,184 @@ var http = require("http");
 var url = require("url");
 var fabric = require("./fabric");
 var users = require("./users");
+var projects = require("./projects");
 
-function h_fabrics(query, vars, data, response) {
-	response.write(JSON.stringify(fabric.list()));
-}
+var current_user;
 
-/*function hook_fabric(rurl, components, content, response) {
-	if (components[3] == "create") {
-		new fabric.Fabric(components[2],"");
-		response.write(JSON.stringify(fabric.get(components[2])));
-	} else {
-		var fab = fabric.get(components[2]);
-		if (fab !== undefined) {
-			if (components[3] == "get") {
-				response.write(fab.get(components[4],components[5]));
-			} else if (components[3] == "set") {
-				fab.set(components[4],components[5],components[6]);
-				response.write(components[6]);
-			} else if (components[3] == "query") {
-				response.write(JSON.stringify(fab.query(components[4],10)));
-			}
-		}
-	}
-}*/
 
-function h_fabric_create(query, vars, data, response) {
-	new fabric.Fabric(vars[0],"");
-	response.write(JSON.stringify(fabric.get(vars[0])));
-}
+/* ========== User service hooks ========== */
 
 function h_user(query, vars, data, response) {
 	var username = vars[0];
 }
 
+
+/* ========== Project service hooks ========== */
+
 /*
- * Provide a list of saved sessions for a given user.
- *    /user/<username>/sessions
+ * Respond with a json hash of all projects in the following form:
+ *		{
+ *			<project id>: {
+ *				id: <id>,
+ *				name: <name>,
+ *				description: <description>,
+ *				author: <author>,
+ *				created: <date>
+ *			}, ...
+ *		}
  */
-function h_sessions(query, vars, data, response) {
-	var username = vars[0];
-	response.write('[{"name": "Autosaved"}]');
+function h_projects(query, vars, data, response) {
+	response.write(JSON.stringify(projects.list()));
 }
+
+function h_project(query, vars, data, response) {
+	var pro = projects.get(vars[0]);
+	if (pro === undefined) {
+		response.write("false");
+		return;
+	}
+	response.write(JSON.stringify(pro.details()));
+}
+
+/*
+ * Create a new project and return the unique id for it.
+ *		name:			The projects name
+ *		description:
+ * Automatically sets the author to the authorised user and the creation date
+ * to the current date/time.
+ */
+function h_projects_create(query, vars, data, response) {
+	//Perform checks on parameters!!
+
+	var projid = projects.create(query.name,query.description,current_user);
+	response.write('{"success": "true", "id": "'+projid+'"}');
+}
+
+function h_project_fabrics(query, vars, data, response) {
+	var pro = projects.get(vars[0]);
+	console.log(vars[0]);
+	if (pro !== undefined) {
+		response.write(JSON.stringify(pro.listFabrics()));
+	} else {
+		response.write("false");
+	}
+}
+
+function h_project_fabrics_add(query, vars, data, response) {
+	var pro = projects.get(vars[0]);
+	var fab = fabric.get(query.fid);
+	if (pro !== undefined && fab !== undefined) {
+		pro.addFabric(query.name, fab);
+		response.write('{"success": "true"}');
+	} else {
+		response.write('{"success": "false"}');
+	}
+}
+
+function h_project_views(query, vars, data, response) {
+
+}
+
+function h_project_wspaces(query, vars, data, response) {
+
+}
+
+function h_project_layouts(query, vars, data, response) {
+
+}
+
+
+/* ========== Fabric service hooks ========== */
 
 function h_fabric(query, vars, data, response) {
 
 }
 
+function h_fabrics(query, vars, data, response) {
+	response.write(JSON.stringify(fabric.list()));
+}
+
+function h_fabrics_create(query, vars, data, response) {
+	var fabid = fabric.create();
+	response.write('{"success": "true", "id": "'+fabid+'"}');
+}
+
+function h_fabric_handles(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write("false");
+	} else {
+		response.write(JSON.stringify(fab.listHandles()));
+	}
+}
+
+function h_fabric_handles_create(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write('{"success": "false"}');
+	} else {
+		fab.createHandle(query.name,query.rela,query.relb);
+		response.write('{"success": "true"}');
+	}
+	
+}
+
+function h_fabric_oracles(query, vars, data, response) {
+	response.write(JSON.stringify(fabric.get(vars[0]).listOracles()));
+}
+
+function h_fabric_oracles_create(query, vars, data, response) {
+
+}
+
+
+/* ========== Hooks Table ========== */
+
 /* All registered service hooks, corresponding to the URL given */
 var hooks = {
-	"fabrics":		{ hook: h_fabrics },
-	"fabric":		{ hook: h_fabric, vars: 1, children: {
+	"projects":			{ hook: h_projects, children: {
+		"create":		{ hook: h_projects_create }
+	}},
+	"project":			{ hook: h_project, vars: 1, children: {
+		"fabrics":		{ hook: h_project_fabrics, children: {
+			"add":		{ hook: h_project_fabrics_add }
+		}},
+		"views":		{ hook: h_project_views },
+		"wspaces":		{ hook: h_project_wspaces },
+		"layouts":		{ hook: h_project_layouts }
+	}},
+	"fabrics":			{ hook: h_fabrics, children: {
+		"create":		{ hook: h_fabrics_create }
+	}},
+	"fabric":			{ hook: h_fabric, vars: 1, children: {
+		"handles":		{ hook: h_fabric_handles, children: {
+			"create":	{ hook: h_fabric_handles_create }
+		}},
+		"oracles":		{ hook: h_fabric_oracles, children: {
+			"create":	{ hook: h_fabric_oracles_create }
+		}}
 		//"get":		{ hook: h_fabric_get, vars: 2 },
 		//"query":	{ hook: h_fabric_query, vars: 1 },
-		"create":	{ hook: h_fabric_create }
+		//"handles":
+			//"create":
+		//"oracles":
+			//"create":
+		//"labels":
+			//"create":
+		//"label":
+		//"relations":
+		//"unique":
+		//"set":
+		//"handle":
+			//"set":
+		//"oracle":
+			//"set":
 	}},
-	"user":			{ hook: h_user, vars: 1, children: {
-		"sessions": { hook: h_sessions }
-	}}
+	"user":			{ hook: h_user, vars: 1 }
 };
+
+
+/* ========== Main Service Functions ========== */
 
 function parseCookies (request) {
     var list = {},
@@ -86,7 +206,7 @@ function start() {
 
 			if (res.success == true) {
 				response.writeHead(200, {
-					"Set-Cookie": "usercode="+res.sessid+"; httponly",
+					"Set-Cookie": "dsbsessid="+res.sessid+"; httponly",
 					"Content-Type": "application/json"
 				});
 
@@ -117,7 +237,33 @@ function start() {
 				});
 				response.write(callback+'({"success": "false", "reason": "'+res.reason+'"});');
 			}
+		} else if (components[1] == "checklogin") {
+			current_sessid = parseCookies(request).dsbsessid;
+
+			response.writeHead(200, {
+				"Content-Type": "application/json"
+			});
+			response.write(callback+"(");
+
+			if (current_sessid === undefined || users.isLoggedIn(current_sessid) == false) {
+					response.write('{"success": "false"}');
+			} else {
+					current_user = users.getName(current_sessid);
+					response.write('{"success": "true", "username": "'+current_user+'"}');
+			}
+
+			response.write(");");
 		} else {
+			current_sessid = parseCookies(request).dsbsessid;
+
+			if (current_sessid === undefined || users.isLoggedIn(current_sessid) == false) {
+				response.writeHead(401, {});
+				response.end();
+				return;
+			}
+
+			current_user = users.getName(current_sessid);
+
 			if (components[1] === undefined) {
 				response.writeHead(404, {});
 			} else {
@@ -131,7 +277,7 @@ function start() {
 						if (curhook.vars !== undefined) {
 							var i;
 							for (i=0; i<curhook.vars; i++) {
-								vars.push(components[curid]);
+								vars.push(decodeURIComponent(components[curid]));
 								curid++;
 							}
 						}
@@ -151,9 +297,13 @@ function start() {
 						response.writeHead(200, {
 							"Content-Type": "application/json"
 						});
-						response.write(callback+"(");
+						if (callback !== undefined) {
+							response.write(callback+"(");
+						}
 						curhook.hook(rurl.query, vars, {}, response);
-						response.write(");");
+						if (callback !== undefined) {
+							response.write(");");
+						}
 					}
 				}
 			}

@@ -3,6 +3,7 @@
 <head>
 	<title>DSB Client</title>
     <link rel="stylesheet" type="text/css" href="js/libs/w2ui-1.4.2.css" />
+	<link rel="stylesheet" type="text/css" href="css/font.css" />
 	<link rel="stylesheet" type="text/css" href="css/dsbui.css" />
     <script src="js/libs/jquery.min.js"></script>
     <script type="text/javascript" src="js/libs/w2ui-1.4.2.min.js"></script>
@@ -12,7 +13,7 @@
 </head>
 <body>
 	<div id="myToolbar"></div>
-	<div id="dsblogo">DSB - v1</div>
+	<div id="dsblogo">Dynamic Structure Base</div>
 	<div id="menubottom"></div>
 	<div id="signuppopup" style="display: none;">
 		<div class="signupform">
@@ -32,17 +33,24 @@
 		</div>
 	</div>
 
+	<div id="createprojectpopup" style="display: none;">
+		<div class="loginform">
+		<div class="loginlabel">Name:<span class="required">*</span></div> <input class="login" id="dsb_projectname" type="text"><br/>
+		<div class="loginlabel">Description:</div> <input id="dsb_projectdesc" type="text">
+		</div>
+	</div>
+
     <div id="myLayout"></div>
 </body>
 <script>
-var dsb;
-var dsbui;
-
 $(function () {
-	dsb = new DSB();
-	dsbui = new DSBUI(dsb);
-
-	dsbui.showLogin("Login");
+	dsb.checkLogin(function(username) {
+		if (username === undefined) {
+			dsbui.showLogin("Login");
+		} else {
+			dsbui.showProjects();
+		}
+	});
 });
 </script>
 </html>
