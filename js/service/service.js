@@ -52,6 +52,10 @@ function h_projects_create(query, vars, data, response) {
 	//Perform checks on parameters!!
 
 	var projid = projects.create(query.name,query.description,current_user);
+
+	//Initialise with a model fabric
+	projects.get(projid).addFabric("model",fabric.get(fabric.create()));
+
 	response.write('{"success": "true", "id": "'+projid+'"}');
 }
 

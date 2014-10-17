@@ -46,20 +46,22 @@
 		var outer;
 		var titlebar;
 		var content;
+		var typeicon;
 
 		content = jQuery('<div/>', {
 			class: "dsbwindow-content"
 		});
 
+		switch (options.type) {
+		case "view": typeicon = "icon-screen"; break;
+		case "workspace": typeicon = "icon-lab"; break;
+		case "fabric": typeicon = "icon-tree"; break;
+		}
+
 		titlebar = jQuery('<div/>', {
 			class: "dsbwindow-title",
-			html: "<table class=\"dsbtitlemenu\" cellpadding=\"1\" cellspacing=\"0\"><tr><td class=\"w2ui-tb-caption\" nowrap>"+'<span class="icon-eye"></span>&nbsp;&nbsp;&nbsp;'+options.title+"&nbsp;&nbsp;</td><td class=\"w2ui-tb-down\" nowrap><div class=\"dsbdown\"></div></td></tr></table>"
+			html: "<table class=\"dsbtitlemenu\" cellpadding=\"1\" cellspacing=\"0\"><tr><td class=\"w2ui-tb-caption\" nowrap>"+'<span class="'+typeicon+'"></span>&nbsp;&nbsp;&nbsp;'+options.title+"&nbsp;&nbsp;</td><td class=\"w2ui-tb-down\" nowrap><div class=\"dsbdown\"></div></td></tr></table>"
 		});
-		/*if (options.type == "view") {
-			titlebar.addClass("dsbwindow-VIEW");
-		} else if (options.type == "workspace") {
-			titlebar.addClass("dsbwindow-WORK");
-		}*/
 
 		var titbut = titlebar.find(".dsbtitlemenu");
 
@@ -67,8 +69,9 @@
 			$(this).w2menu({
 				items: [
 					{ id: 1, text: "Maximize" },
-					{ id: 2, text: "Close" }
-				]
+					{ id: 2, text: "<span class='icon-close'></span>&nbsp;&nbsp;Close"}
+				],
+				onSelect: function(event) { options.object.isopen = false; outer.remove(); }
 			});
 		});
 		titbut.mouseenter(function() {

@@ -79,6 +79,10 @@ var dsb = {};
 		sendCommand("/fabrics",{},"",cb);
 	}
 
+	function addHandle(fabid, hname, cb) {
+		sendCommand("/fabric/"+fabid+"/handles/create", {name: hname}, undefined, cb);
+	}
+
 	/*
 	 * Register a new user signup.
 	 * Does not automatically log in if successful.
@@ -154,5 +158,6 @@ var dsb = {};
 	exports.getProjects = getProjects;
 	exports.getProjectName = getProjectName;
 	exports.getUsername = getUsername;
+	exports.addHandle = addHandle;
 })(dsb);
 
