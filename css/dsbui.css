@@ -188,6 +188,7 @@ div.dsbwindow-outer {
 }
 
 div.dsbwindow-title {
+	/*float: left;*/
 	width: 100%;
 	height: 20px;
 	-webkit-border-radius: 6px;
@@ -211,6 +212,12 @@ div.dsbwindow-VIEW {
 	
 }
 
+div.handlewin {
+	background-color: #eeeeee;
+	padding: 5px;
+	text-align: center;
+}
+
 div.dsbwindow-WORK {
 	background-image: -webkit-linear-gradient(#c1d1ef, #a7b5cf);
 	background-image: -moz-linear-gradient(#ececec, #dfdfdf);
@@ -220,7 +227,9 @@ div.dsbwindow-WORK {
 }
 
 div.dsbwindow-content {
-
+	padding: 0px;
+	color: black;
+	font-size: 10px;
 }
 
 div.dsbdown {

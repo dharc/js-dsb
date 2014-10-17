@@ -5,6 +5,7 @@ var dsb = {};
 	var remote = "http://localhost:8888";
 	var username = "";
 	var project = undefined;
+	var projectid = undefined;
 	var projects = {};
 
 	function sendCommand(cmd,params,data,cb) {
@@ -42,7 +43,7 @@ var dsb = {};
 	}
 
 	function setProject(projid, cb) {
-		//project = projects[projid];
+		projectid = projid;
 		sendCommand(
 		 "/project/"+projid,
 		 {}, undefined, function(data) {
@@ -61,18 +62,34 @@ var dsb = {};
 				cb(false,"Unable to contact server");
 			} else {
 				if (data.success == "true") {
-					projects[data.projectid] = {
+					projects[data.id] = {
 						name: proname,
 						description: prodesc,
 						author: username,
-						id: data.projectid
+						id: data.id
 					};
-					cb(true,"",data.projectid);
+					cb(true,"",data.id);
 				} else {
 					cb(false,data.reason,"");
 				}
 			}
 		});
+	}
+
+	function createFabric(cb) {
+		sendCommand("/fabrics/create",{},undefined,cb);
+	}
+
+	function addFabric(pname, fabid, cb) {
+		sendCommand(
+			"/project/"+projectid+"/fabrics/add",
+			{name: pname, fid: fabid},
+			undefined,
+			function (data) {
+				//
+				cb(data);
+			}
+		);
 	}
 
 	function getFabrics(cb) {
@@ -94,10 +111,10 @@ var dsb = {};
 	/*
 	 * Add a new named oracle to a given fabric.
 	 */
-	function createOracle(fabid, hname, cb) {
+	function createOracle(fabid, hname, gname, cb) {
 		sendCommand(
 			"/fabric/"+fabid+"/oracles/create",
-			{name: hname},
+			{name: hname, rela: gname, relb: hname},
 			undefined,
 			cb
 		);
@@ -211,5 +228,7 @@ var dsb = {};
 	exports.getOracle = getOracle;
 	exports.setOracle = setOracle;
 	exports.getHandle = getHandle;
+	exports.createFabric = createFabric;
+	exports.addFabric = addFabric;
 })(dsb);
 

@@ -104,11 +104,36 @@ function Fabric(id, ssf) {
 	this.oracles = {};
 	this.serverside = ssf;
 	this.firstfree = [100,0];
+	this.label2node = {};
+	this.node2label = {};
 }
+
+Fabric.prototype.lookupNode = function(label) {
+	var res = this.label2node[label];
+	if (res === undefined) {
+		res = this.createNode();
+		this.label2node[label] = res;
+		this.node2label[res] = label;
+	}
+	return res;
+};
+
+Fabric.prototype.lookupLabel = function(node) {
+	return this.node2label[node];
+};
+
+Fabric.prototype.getLabels = function() {
+	return this.label2node;
+};
+
+Fabric.prototype.dump = function() {
+	return this.relations;
+};
 
 Fabric.prototype.createNode = function() {
 	//Return a new node id
-	return "0:0";
+	this.firstfree[1] += 1;
+	return ""+this.firstfree[0]+":"+this.firstfree[1];
 };
 
 Fabric.prototype.createOracle = function(name, rela, relb) {
@@ -116,9 +141,13 @@ Fabric.prototype.createOracle = function(name, rela, relb) {
 	var prelb = relb;
 	if (prela === undefined) {
 		prela = this.createNode();
+	} else if (!prela.match(/^[0-9]+:[0-9]+$/)) {
+		prela = this.lookupNode(prela);
 	}
 	if (prelb === undefined) {
 		prelb = this.createNode();
+	} else if (!prelb.match(/^[0-9]+:[0-9]+$/)) {
+		prelb = this.lookupNode(prelb);
 	}
 	this.oracles[name] = new Oracle(this, prela, prelb);
 };
@@ -218,10 +247,10 @@ function get(fabid) {
 	return fabrics[fabid];
 }
 
-function create() {
+function create(ssf) {
 	var fabid;
 	fabid = "f"+crypto.randomBytes(8).toString('hex');
-	fabrics[fabid] = new Fabric(fabid);
+	fabrics[fabid] = new Fabric(fabid, ssf);
 	return fabid;
 }
 

@@ -54,7 +54,7 @@ function h_projects_create(query, vars, data, response) {
 	var projid = projects.create(query.name,query.description,current_user);
 
 	//Initialise with a model fabric
-	projects.get(projid).addFabric("model",fabric.get(fabric.create()));
+	projects.get(projid).addFabric("model",fabric.get(fabric.create(true)));
 
 	response.write('{"success": "true", "id": "'+projid+'"}');
 }
@@ -104,7 +104,7 @@ function h_fabrics(query, vars, data, response) {
 }
 
 function h_fabrics_create(query, vars, data, response) {
-	var fabid = fabric.create();
+	var fabid = fabric.create(false);
 	response.write('{"success": "true", "id": "'+fabid+'"}');
 }
 
@@ -173,6 +173,24 @@ function h_fabric_oracle(query, vars, data, response) {
 	}
 }
 
+function h_fabric_download(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write("undefined");
+	} else {
+		response.write(JSON.stringify(fab.dump()));
+	}
+}
+
+function h_fabric_labels(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write("undefined");
+	} else {
+		response.write(JSON.stringify(fab.getLabels()));
+	}
+}
+
 
 /* ========== Hooks Table ========== */
 
@@ -200,7 +218,9 @@ var hooks = {
 			"create":	{ hook: h_fabric_oracles_create }
 		}},
 		"handle":		{ hook: h_fabric_handle, vars: 1 },
-		"oracle":		{ hook: h_fabric_oracle, vars: 1 }
+		"oracle":		{ hook: h_fabric_oracle, vars: 1 },
+		"download":		{ hook: h_fabric_download },
+		"labels":		{ hook: h_fabric_labels }
 		//"get":		{ hook: h_fabric_get, vars: 2 },
 		//"query":	{ hook: h_fabric_query, vars: 1 },
 		//"handles":
