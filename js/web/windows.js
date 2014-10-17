@@ -52,6 +52,7 @@
 			class: "dsbwindow-content"
 		});
 
+		//Change icon depending upon window type
 		switch (options.type) {
 		case "view": typeicon = "icon-screen"; break;
 		case "workspace": typeicon = "icon-lab"; break;
@@ -65,6 +66,7 @@
 
 		var titbut = titlebar.find(".dsbtitlemenu");
 
+		//Display a menu when title is clicked.
 		titbut.click(function(e) {
 			$(this).w2menu({
 				items: [
@@ -88,12 +90,13 @@
 		outer = jQuery('<div/>', {
 			class: "dsbwindow-outer"
 		});
+
+		//Make draggable.
 		outer.drags({handle: titlebar});
 
 		content.appendTo(outer);
 		titlebar.appendTo(outer);
 		outer.appendTo('#defaultview');
-		//$('#defaultview').append('<div class="dsbwindow-outer"><div class="dsbwindow-title">'+options.title+'</div><div class="dsbwindow-content"></div></div>').drags();
 	}
 
 	global.DSBWindow = DSBWindow;

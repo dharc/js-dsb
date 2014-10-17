@@ -65,6 +65,10 @@ Handle.prototype.notify = function(value) {
 	}
 };
 
+Handle.prototype.get = function() {
+	return this.fabric.get(this.rela,this.relb);
+};
+
 /* ========== Oracle ========== */
 
 function Oracle(fabric, rela, relb) {
@@ -80,6 +84,14 @@ Oracle.prototype.addHandle = function(handle) {
 
 Oracle.prototype.notify = function(value) {
 	this.fabric.set(this.rela,this.relb,value);
+};
+
+Oracle.prototype.get = function() {
+	return this.fabric.get(this.rela,this.relb);
+};
+
+Oracle.prototype.set = function(value) {
+	this.notify(value);
 };
 
 

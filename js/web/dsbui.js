@@ -18,7 +18,7 @@ var dsbui = {};
 	function showCreateHandle(fabid) {
 		$('#handlepopup').w2popup({
 			title: '<span class="icon-flag"></span>&nbsp;Create Handle',
-			buttons: '<button class="emph" id="btn_createhandle">Create</button>',
+			buttons: '<button class="emph" id="btn_createhandle">Create</button><button>Cancel</button>',
 			modal: false,
 			showClose: true,
 			width: 350,
@@ -27,9 +27,62 @@ var dsbui = {};
 
 		$('#btn_createhandle').click(function(event) {
 			w2popup.lock();
-			dsb.addHandle(fabid, $('div#w2ui-popup #dsb_handlename')[0].value, function(data) {
+			dsb.createHandle(fabid, $('div#w2ui-popup #dsb_handlename')[0].value, function(data) {
 				w2popup.close();
 				//TODO Refresh sidebar.
+			});
+		});
+	}
+
+	function showCreateOracle(fabid) {
+		$('#oraclepopup').w2popup({
+			title: '<span class="icon-flag"></span>&nbsp;Create Oracle',
+			buttons: '<button class="emph" id="btn_createoracle">Create</button><button>Cancel</button>',
+			modal: false,
+			showClose: true,
+			width: 350,
+			height: 200
+		});
+
+		$('#btn_createoracle').click(function(event) {
+			w2popup.lock();
+			dsb.createOracle(fabid, $('div#w2ui-popup #dsb_oraclename')[0].value, function(data) {
+				w2popup.close();
+				//TODO Refresh sidebar.
+			});
+		});
+	}
+
+	function showHandle(fabid, hname) {
+		$('#viewhandlepopup').w2popup({
+			title: '<span class="icon-flag"></span>&nbsp;Handle: "'+hname+'"',
+			buttons: '<button>Close</button>',
+			modal: false,
+			showClose: true,
+			width: 350,
+			height: 150
+		});
+	}
+
+	function showOracle(fabid, hname) {
+		$('#vieworaclepopup').w2popup({
+			title: '<span class="icon-flag"></span>&nbsp;Oracle: "'+hname+'"',
+			buttons: '<button id="btn_saveoracle" class="emph">Save</button><button>Close</button>',
+			modal: false,
+			showClose: true,
+			width: 350,
+			height: 150
+		});
+
+		w2popup.lock();
+		dsb.getOracle(fabid, hname, function(val) {
+			w2popup.unlock();
+			$('div#w2ui-popup #dsb_oraclevalue')[0].value = val;
+		});
+
+		$('#btn_saveoracle').click(function(event) {
+			dsb.setOracle(fabid,hname,$('div#w2ui-popup #dsb_oraclevalue')[0].value, function() {
+				w2popup.close();
 			});
 		});
 	}
@@ -47,6 +100,8 @@ var dsbui = {};
 		$('#btn_dsbcreate').click(function(event) {
 			if (w2ui['mySidebar'].selected.match(/^.*handles$/)) {
 				showCreateHandle(w2ui['mySidebar'].get(w2ui['mySidebar'].selected).parent.fabid);
+			} else if (w2ui['mySidebar'].selected.match(/^.*oracles$/)) {
+				showCreateOracle(w2ui['mySidebar'].get(w2ui['mySidebar'].selected).parent.fabid);
 			}
 		});
 	}
@@ -102,14 +157,18 @@ var dsbui = {};
 
 			nodel4 = { id: 'fabric-'+i+'handles', text: "Handles", img: 'icon-folder', nodes: [] };
 			for (j=0; j<prodata.fabrics[i].handles.length; j++) {
-				nodel5 = { id: 'fabric-'+i+'handle-'+j, text: prodata.fabrics[i].handles[j], img: 'icon-flag' };
+				nodel5 = { id: 'fabric-'+i+'handle-'+j, text: prodata.fabrics[i].handles[j], img: 'icon-flag', onDblClick: function(event) {
+					showHandle(event.object.parent.parent.fabid, event.object.text);
+				}};
 				nodel4.nodes.push(nodel5);
 			}
 			nodel3.nodes.push(nodel4);
 
 			nodel4 = { id: 'fabric-'+i+'oracles', text: "Oracles", img: 'icon-folder', nodes: [] };
 			for (j=0; j<prodata.fabrics[i].oracles.length; j++) {
-				nodel5 = { id: 'fabric-'+i+'oracle-'+j, text: prodata.fabrics[i].oracles[j], img: 'icon-eye' };
+				nodel5 = { id: 'fabric-'+i+'oracle-'+j, text: prodata.fabrics[i].oracles[j], img: 'icon-eye', onDblClick: function(event) {
+					showOracle(event.object.parent.parent.fabid, event.object.text);
+				}};
 				nodel4.nodes.push(nodel5);
 			}
 			nodel3.nodes.push(nodel4);

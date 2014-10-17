@@ -128,12 +128,49 @@ function h_fabric_handles_create(query, vars, data, response) {
 	
 }
 
+function h_fabric_handle(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write("undefined");
+	} else {
+		var han = fab.getHandle(vars[1]);
+		if (han === undefined) {
+			response.write("undefined");
+		} else {
+			response.write(JSON.stringify(han.get()));
+		}
+	}
+}
+
 function h_fabric_oracles(query, vars, data, response) {
 	response.write(JSON.stringify(fabric.get(vars[0]).listOracles()));
 }
 
 function h_fabric_oracles_create(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write('{"success": "false"}');
+	} else {
+		fab.createOracle(query.name,query.rela,query.relb);
+		response.write('{"success": "true"}');
+	}
+}
 
+function h_fabric_oracle(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write("undefined");
+	} else {
+		var han = fab.getOracle(vars[1]);
+		if (han === undefined) {
+			response.write("undefined");
+		} else {
+			if (query.value !== undefined) {
+				han.set(query.value);
+			}
+			response.write(JSON.stringify(han.get()));
+		}
+	}
 }
 
 
@@ -161,7 +198,9 @@ var hooks = {
 		}},
 		"oracles":		{ hook: h_fabric_oracles, children: {
 			"create":	{ hook: h_fabric_oracles_create }
-		}}
+		}},
+		"handle":		{ hook: h_fabric_handle, vars: 1 },
+		"oracle":		{ hook: h_fabric_oracle, vars: 1 }
 		//"get":		{ hook: h_fabric_get, vars: 2 },
 		//"query":	{ hook: h_fabric_query, vars: 1 },
 		//"handles":

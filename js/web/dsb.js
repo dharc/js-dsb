@@ -79,8 +79,55 @@ var dsb = {};
 		sendCommand("/fabrics",{},"",cb);
 	}
 
-	function addHandle(fabid, hname, cb) {
-		sendCommand("/fabric/"+fabid+"/handles/create", {name: hname}, undefined, cb);
+	/*
+	 * Add a new named handle to a given fabric.
+	 */
+	function createHandle(fabid, hname, cb) {
+		sendCommand(
+			"/fabric/"+fabid+"/handles/create",
+			{name: hname},
+			undefined,
+			cb
+		);
+	}
+
+	/*
+	 * Add a new named oracle to a given fabric.
+	 */
+	function createOracle(fabid, hname, cb) {
+		sendCommand(
+			"/fabric/"+fabid+"/oracles/create",
+			{name: hname},
+			undefined,
+			cb
+		);
+	}
+
+	function getOracle(fabid, hname, cb) {
+		sendCommand(
+			"/fabric/"+fabid+"/oracle/"+hname,
+			{},
+			undefined,
+			cb
+		);
+	}
+
+	function setOracle(fabid, hname, pvalue, cb) {
+		sendCommand(
+			"/fabric/"+fabid+"/oracle/"+hname,
+			{value: pvalue},
+			undefined,
+			cb
+		);
+	}
+
+	function getHandle(fabid, hname, cb) {
+		sendCommand(
+			"/fabric/"+fabid+"/handle/"+hname,
+			{},
+			undefined,
+			cb
+		);
 	}
 
 	/*
@@ -89,20 +136,21 @@ var dsb = {};
 	 */
 	function signup(name,pass,mail,firstn,lastn,cb) {
 		sendCommand(
-		 "/signup",
-		 {username: name, password: pass, email: mail, first: firstn, last: lastn},
-		 undefined,
-		 function(data) {
-			if (data === undefined || data.success === undefined) {
-				cb(false,"Unable to contact server");
-			} else {
-				if (data.success == "true") {
-					cb(true,"");
+			"/signup",
+			{username: name, password: pass, email: mail, first: firstn, last: lastn},
+			undefined,
+			function(data) {
+				if (data === undefined || data.success === undefined) {
+					cb(false,"Unable to contact server");
 				} else {
-					cb(false,data.reason);
+					if (data.success == "true") {
+						cb(true,"");
+					} else {
+						cb(false,data.reason);
+					}
 				}
 			}
-		});
+		);
 	}
 
 	/*
@@ -158,6 +206,10 @@ var dsb = {};
 	exports.getProjects = getProjects;
 	exports.getProjectName = getProjectName;
 	exports.getUsername = getUsername;
-	exports.addHandle = addHandle;
+	exports.createHandle = createHandle;
+	exports.createOracle = createOracle;
+	exports.getOracle = getOracle;
+	exports.setOracle = setOracle;
+	exports.getHandle = getHandle;
 })(dsb);
 
