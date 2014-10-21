@@ -2,11 +2,17 @@ var dsb = {};
 
 (function (exports) {
 	var fabric = undefined;
-	var remote = "http://localhost:8888";
+	var remote; //"http://localhost:8888";
 	var username = "";
 	var project = undefined;
 	var projectid = undefined;
 	var projects = {};
+
+	if (window.location.hostname == "dharc.github.io") {
+		remote = "http://dsb.dharc.co.uk:8888";
+	} else {
+		remote = "http://"+window.location.hostname+":8888";
+	}
 
 	function sendCommand(cmd,params,data,cb) {
 		var qstring = "?";
