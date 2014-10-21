@@ -65,6 +65,10 @@ Handle.prototype.notify = function(value) {
 	}
 };
 
+Handle.prototype.get = function() {
+	return this.fabric.get(this.rela,this.relb);
+};
+
 /* ========== Oracle ========== */
 
 function Oracle(fabric, rela, relb) {
@@ -82,6 +86,14 @@ Oracle.prototype.notify = function(value) {
 	this.fabric.set(this.rela,this.relb,value);
 };
 
+Oracle.prototype.get = function() {
+	return this.fabric.get(this.rela,this.relb);
+};
+
+Oracle.prototype.set = function(value) {
+	this.notify(value);
+};
+
 
 /* ========== Fabric ========== */
 
@@ -92,11 +104,50 @@ function Fabric(id, ssf) {
 	this.oracles = {};
 	this.serverside = ssf;
 	this.firstfree = [100,0];
+	this.label2node = {};
+	this.node2label = {};
+	this.trig_change = [];
 }
+
+Fabric.prototype.addGlobal = function (type, cb) {
+	switch(type) {
+	case 'change': this.trig_change.push(cb); break;
+	}
+};
+
+Fabric.prototype.triggerChange = function(rel) {
+	var i;
+	for (i=0; i<this.trig_change.length; i++) {
+		this.trig_change[i](rel.a, rel.b);
+	}
+};
+
+Fabric.prototype.lookupNode = function(label) {
+	var res = this.label2node[label];
+	if (res === undefined) {
+		res = this.createNode();
+		this.label2node[label] = res;
+		this.node2label[res] = label;
+	}
+	return res;
+};
+
+Fabric.prototype.lookupLabel = function(node) {
+	return this.node2label[node];
+};
+
+Fabric.prototype.getLabels = function() {
+	return this.label2node;
+};
+
+Fabric.prototype.dump = function() {
+	return this.relations;
+};
 
 Fabric.prototype.createNode = function() {
 	//Return a new node id
-	return "0:0";
+	this.firstfree[1] += 1;
+	return ""+this.firstfree[0]+":"+this.firstfree[1];
 };
 
 Fabric.prototype.createOracle = function(name, rela, relb) {
@@ -104,9 +155,13 @@ Fabric.prototype.createOracle = function(name, rela, relb) {
 	var prelb = relb;
 	if (prela === undefined) {
 		prela = this.createNode();
+	} else if (!prela.match(/^[0-9]+:[0-9]+$/)) {
+		prela = this.lookupNode(prela);
 	}
 	if (prelb === undefined) {
 		prelb = this.createNode();
+	} else if (!prelb.match(/^[0-9]+:[0-9]+$/)) {
+		prelb = this.lookupNode(prelb);
 	}
 	this.oracles[name] = new Oracle(this, prela, prelb);
 };
@@ -190,6 +245,7 @@ Fabric.prototype.set = function(a,b,c) {
 		this.relations[a][b] = rel;
 	}
 	rel.setvalue(c);
+	this.triggerChange(rel);
 }
 
 function list() {
@@ -206,10 +262,10 @@ function get(fabid) {
 	return fabrics[fabid];
 }
 
-function create() {
+function create(ssf) {
 	var fabid;
 	fabid = "f"+crypto.randomBytes(8).toString('hex');
-	fabrics[fabid] = new Fabric(fabid);
+	fabrics[fabid] = new Fabric(fabid, ssf);
 	return fabid;
 }
 

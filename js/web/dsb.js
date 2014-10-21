@@ -2,10 +2,17 @@ var dsb = {};
 
 (function (exports) {
 	var fabric = undefined;
-	var remote = "http://localhost:8888";
+	var remote; //"http://localhost:8888";
 	var username = "";
 	var project = undefined;
+	var projectid = undefined;
 	var projects = {};
+
+	if (window.location.hostname == "dharc.github.io") {
+		remote = "http://dsb.dharc.co.uk:8888";
+	} else {
+		remote = "http://"+window.location.hostname+":8888";
+	}
 
 	function sendCommand(cmd,params,data,cb) {
 		var qstring = "?";
@@ -42,7 +49,7 @@ var dsb = {};
 	}
 
 	function setProject(projid, cb) {
-		//project = projects[projid];
+		projectid = projid;
 		sendCommand(
 		 "/project/"+projid,
 		 {}, undefined, function(data) {
@@ -61,13 +68,13 @@ var dsb = {};
 				cb(false,"Unable to contact server");
 			} else {
 				if (data.success == "true") {
-					projects[data.projectid] = {
+					projects[data.id] = {
 						name: proname,
 						description: prodesc,
 						author: username,
-						id: data.projectid
+						id: data.id
 					};
-					cb(true,"",data.projectid);
+					cb(true,"",data.id);
 				} else {
 					cb(false,data.reason,"");
 				}
@@ -75,8 +82,75 @@ var dsb = {};
 		});
 	}
 
+	function createFabric(cb) {
+		sendCommand("/fabrics/create",{},undefined,cb);
+	}
+
+	function addFabric(pname, fabid, cb) {
+		sendCommand(
+			"/project/"+projectid+"/fabrics/add",
+			{name: pname, fid: fabid},
+			undefined,
+			function (data) {
+				//
+				cb(data);
+			}
+		);
+	}
+
 	function getFabrics(cb) {
 		sendCommand("/fabrics",{},"",cb);
+	}
+
+	/*
+	 * Add a new named handle to a given fabric.
+	 */
+	function createHandle(fabid, hname, gname, cb) {
+		sendCommand(
+			"/fabric/"+fabid+"/handles/create",
+			{name: hname, rela: gname, relb: hname},
+			undefined,
+			cb
+		);
+	}
+
+	/*
+	 * Add a new named oracle to a given fabric.
+	 */
+	function createOracle(fabid, hname, gname, cb) {
+		sendCommand(
+			"/fabric/"+fabid+"/oracles/create",
+			{name: hname, rela: gname, relb: hname},
+			undefined,
+			cb
+		);
+	}
+
+	function getOracle(fabid, hname, cb) {
+		sendCommand(
+			"/fabric/"+fabid+"/oracle/"+hname,
+			{},
+			undefined,
+			cb
+		);
+	}
+
+	function setOracle(fabid, hname, pvalue, cb) {
+		sendCommand(
+			"/fabric/"+fabid+"/oracle/"+hname,
+			{value: pvalue},
+			undefined,
+			cb
+		);
+	}
+
+	function getHandle(fabid, hname, cb) {
+		sendCommand(
+			"/fabric/"+fabid+"/handle/"+hname,
+			{},
+			undefined,
+			cb
+		);
 	}
 
 	/*
@@ -85,20 +159,21 @@ var dsb = {};
 	 */
 	function signup(name,pass,mail,firstn,lastn,cb) {
 		sendCommand(
-		 "/signup",
-		 {username: name, password: pass, email: mail, first: firstn, last: lastn},
-		 undefined,
-		 function(data) {
-			if (data === undefined || data.success === undefined) {
-				cb(false,"Unable to contact server");
-			} else {
-				if (data.success == "true") {
-					cb(true,"");
+			"/signup",
+			{username: name, password: pass, email: mail, first: firstn, last: lastn},
+			undefined,
+			function(data) {
+				if (data === undefined || data.success === undefined) {
+					cb(false,"Unable to contact server");
 				} else {
-					cb(false,data.reason);
+					if (data.success == "true") {
+						cb(true,"");
+					} else {
+						cb(false,data.reason);
+					}
 				}
 			}
-		});
+		);
 	}
 
 	/*
@@ -154,5 +229,12 @@ var dsb = {};
 	exports.getProjects = getProjects;
 	exports.getProjectName = getProjectName;
 	exports.getUsername = getUsername;
+	exports.createHandle = createHandle;
+	exports.createOracle = createOracle;
+	exports.getOracle = getOracle;
+	exports.setOracle = setOracle;
+	exports.getHandle = getHandle;
+	exports.createFabric = createFabric;
+	exports.addFabric = addFabric;
 })(dsb);
 

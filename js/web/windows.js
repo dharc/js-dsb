@@ -1,5 +1,11 @@
 /* Support draggables in jQuery */
 (function($) {
+	$.fn.dsbWindow = function(opt) {
+		var win = new DSBWindow(opt);
+		win.setContent(this.html());
+		return win;
+	};
+
     $.fn.drags = function(opt) {
 
         opt = $.extend({handle:"",cursor:"move"}, opt);
@@ -42,33 +48,55 @@
 })(jQuery);
 
 (function (global) {
-	function DSBWindow(options) {
-		var outer;
-		var titlebar;
-		var content;
+	var dsbwindows = {};
 
-		content = jQuery('<div/>', {
+	function DSBWindow(options) {
+		this.outer = undefined;
+		this.titlebar = undefined;
+		this.content = undefined;
+		var typeicon;
+		var dwidth = 300;
+		var dheight = 250;
+
+		if (options.name !== undefined) {
+			dsbwindows[options.name] = this;
+		}
+
+		if (options.width !== undefined) {
+			dwidth = options.width;
+		}
+		if (options.height !== undefined) {
+			dheight = options.height;
+		}
+
+		this.content = jQuery('<div/>', {
 			class: "dsbwindow-content"
 		});
 
-		titlebar = jQuery('<div/>', {
+		//Change icon depending upon window type
+		switch (options.type) {
+		case "view": typeicon = "icon-screen"; break;
+		case "workspace": typeicon = "icon-lab"; break;
+		case "fabric": typeicon = "icon-tree"; break;
+		case "handle": typeicon = "icon-flag"; break;
+		case "oracle": typeicon = "icon-eye"; break;
+		}
+
+		this.titlebar = jQuery('<div/>', {
 			class: "dsbwindow-title",
-			html: "<table class=\"dsbtitlemenu\" cellpadding=\"1\" cellspacing=\"0\"><tr><td class=\"w2ui-tb-caption\" nowrap>"+'<span class="icon-eye"></span>&nbsp;&nbsp;&nbsp;'+options.title+"&nbsp;&nbsp;</td><td class=\"w2ui-tb-down\" nowrap><div class=\"dsbdown\"></div></td></tr></table>"
+			html: "<table class=\"dsbtitlemenu\" cellpadding=\"1\" cellspacing=\"0\"><tr><td class=\"w2ui-tb-caption\" nowrap>"+'<span class="'+typeicon+'"></span>&nbsp;&nbsp;&nbsp;'+options.title+"&nbsp;&nbsp;</td><td class=\"w2ui-tb-down\" nowrap><div class=\"dsbdown\"></div></td></tr></table>"
 		});
-		/*if (options.type == "view") {
-			titlebar.addClass("dsbwindow-VIEW");
-		} else if (options.type == "workspace") {
-			titlebar.addClass("dsbwindow-WORK");
-		}*/
 
-		var titbut = titlebar.find(".dsbtitlemenu");
+		var titbut = this.titlebar.find(".dsbtitlemenu");
 
+		//Display a menu when title is clicked.
 		titbut.click(function(e) {
 			$(this).w2menu({
 				items: [
 					{ id: 1, text: "Maximize" },
-					{ id: 2, text: "Close" }
-				]
+					{ id: 2, text: "<span class='icon-close'></span>&nbsp;&nbsp;Close"}
+				],
+				onSelect: function(event) { options.object.isopen = false; outer.remove(); }
 			});
 		});
 		titbut.mouseenter(function() {
@@ -82,17 +110,30 @@
 		});
 		titbut.css("cursor","default");
 
-		outer = jQuery('<div/>', {
-			class: "dsbwindow-outer"
+		this.outer = jQuery('<div/>', {
+			class: "dsbwindow-outer",
+			//style: "width="+dwidth+"px; height="+dheight+"px"
+			width: dwidth,
+			height: dheight
 		});
-		outer.drags({handle: titlebar});
 
-		content.appendTo(outer);
-		titlebar.appendTo(outer);
-		outer.appendTo('#defaultview');
-		//$('#defaultview').append('<div class="dsbwindow-outer"><div class="dsbwindow-title">'+options.title+'</div><div class="dsbwindow-content"></div></div>').drags();
+		//Make draggable.
+		this.outer.drags({handle: this.titlebar});
+
+		this.titlebar.appendTo(this.outer);
+		this.content.appendTo(this.outer);
+		this.outer.appendTo('#defaultview');
 	}
 
+	DSBWindow.prototype.getElement = function() {
+		return this.outer;
+	};
+
+	DSBWindow.prototype.setContent = function(c) {
+		this.content.html(c);
+	};
+
 	global.DSBWindow = DSBWindow;
+	global.dsbwindows = dsbwindows;
 }(typeof window !== 'undefined' ? window : global));
 

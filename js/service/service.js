@@ -3,6 +3,7 @@ var url = require("url");
 var fabric = require("./fabric");
 var users = require("./users");
 var projects = require("./projects");
+var framer = require("./framer");
 
 var current_user;
 
@@ -52,6 +53,10 @@ function h_projects_create(query, vars, data, response) {
 	//Perform checks on parameters!!
 
 	var projid = projects.create(query.name,query.description,current_user);
+
+	//Initialise with a model fabric
+	projects.get(projid).addFabric("model",fabric.get(fabric.create(true)));
+
 	response.write('{"success": "true", "id": "'+projid+'"}');
 }
 
@@ -100,7 +105,7 @@ function h_fabrics(query, vars, data, response) {
 }
 
 function h_fabrics_create(query, vars, data, response) {
-	var fabid = fabric.create();
+	var fabid = fabric.create(false);
 	response.write('{"success": "true", "id": "'+fabid+'"}');
 }
 
@@ -124,11 +129,107 @@ function h_fabric_handles_create(query, vars, data, response) {
 	
 }
 
+function h_fabric_handle(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write("undefined");
+	} else {
+		var han = fab.getHandle(vars[1]);
+		if (han === undefined) {
+			response.write("undefined");
+		} else {
+			response.write(JSON.stringify(han.get()));
+		}
+	}
+}
+
 function h_fabric_oracles(query, vars, data, response) {
 	response.write(JSON.stringify(fabric.get(vars[0]).listOracles()));
 }
 
 function h_fabric_oracles_create(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write('{"success": "false"}');
+	} else {
+		fab.createOracle(query.name,query.rela,query.relb);
+		response.write('{"success": "true"}');
+	}
+}
+
+function h_fabric_oracle(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write("undefined");
+	} else {
+		var han = fab.getOracle(vars[1]);
+		if (han === undefined) {
+			response.write("undefined");
+		} else {
+			if (query.value !== undefined) {
+				han.set(query.value);
+			}
+			response.write(JSON.stringify(han.get()));
+		}
+	}
+}
+
+function h_fabric_download(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write("undefined");
+	} else {
+		response.write(JSON.stringify(fab.dump()));
+	}
+}
+
+function h_fabric_labels(query, vars, data, response) {
+	var fab = fabric.get(vars[0]);
+	if (fab === undefined) {
+		response.write("undefined");
+	} else {
+		response.write(JSON.stringify(fab.getLabels()));
+	}
+}
+
+
+/* ========== Framers hooks ========== */
+
+/* List all existing framers */
+
+function h_framers(query, vars, data, response) {
+
+}
+
+/*
+ * Construct a framer for a given fabric.
+ * Can be configured to respond in particular ways.
+ */
+
+function h_framers_create(query, vars, data, response) {
+	var fab = fabric.get(query.fid);
+	if (fab !== undefined) {
+		var framid = framer.create(fab);
+		response.write('{"success": "true", "id": "'+framid+'"}');
+	} else {
+		response.write('{"success": "false"}');
+	}
+}
+
+function h_framer(query, vars, data, response) {
+	var frame = framer.get(vars[0]);
+	if (frame === undefined) {
+		response.write("undefined");
+	} else {
+		response.write(JSON.stringify(frame.dump()));
+	}
+}
+
+function h_framer_suggest(query, vars, data, response) {
+
+}
+
+function h_framer_focus(query, vars, data, response) {
 
 }
 
@@ -148,6 +249,13 @@ var hooks = {
 		"wspaces":		{ hook: h_project_wspaces },
 		"layouts":		{ hook: h_project_layouts }
 	}},
+	"framers":			{ hook: h_framers, children: {
+		"create":		{ hook: h_framers_create }
+	}},	
+	"framer":			{ hook: h_framer, vars: 1, children: {
+		"suggest":		{ hook: h_framer_suggest },
+		"focus":		{ hook: h_framer_focus }
+	}},
 	"fabrics":			{ hook: h_fabrics, children: {
 		"create":		{ hook: h_fabrics_create }
 	}},
@@ -157,7 +265,11 @@ var hooks = {
 		}},
 		"oracles":		{ hook: h_fabric_oracles, children: {
 			"create":	{ hook: h_fabric_oracles_create }
-		}}
+		}},
+		"handle":		{ hook: h_fabric_handle, vars: 1 },
+		"oracle":		{ hook: h_fabric_oracle, vars: 1 },
+		"download":		{ hook: h_fabric_download },
+		"labels":		{ hook: h_fabric_labels }
 		//"get":		{ hook: h_fabric_get, vars: 2 },
 		//"query":	{ hook: h_fabric_query, vars: 1 },
 		//"handles":
