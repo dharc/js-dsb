@@ -22,12 +22,12 @@ var dsbui = {};
 			modal: false,
 			showClose: true,
 			width: 350,
-			height: 200
+			height: 190
 		});
 
 		$('#btn_createhandle').click(function(event) {
 			w2popup.lock();
-			dsb.createHandle(fabid, $('div#w2ui-popup #dsb_handlename')[0].value, function(data) {
+			dsb.createHandle(fabid, $('div#w2ui-popup #dsb_handlename')[0].value, $('div#w2ui-popup #dsb_handlegroup')[0].value, function(data) {
 				w2popup.close();
 				//TODO Refresh sidebar.
 			});
@@ -41,7 +41,7 @@ var dsbui = {};
 			modal: false,
 			showClose: true,
 			width: 350,
-			height: 250
+			height: 190
 		});
 
 		$('#btn_createoracle').click(function(event) {

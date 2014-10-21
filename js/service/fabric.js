@@ -106,7 +106,21 @@ function Fabric(id, ssf) {
 	this.firstfree = [100,0];
 	this.label2node = {};
 	this.node2label = {};
+	this.trig_change = [];
 }
+
+Fabric.prototype.addGlobal = function (type, cb) {
+	switch(type) {
+	case 'change': this.trig_change.push(cb); break;
+	}
+};
+
+Fabric.prototype.triggerChange = function(rel) {
+	var i;
+	for (i=0; i<this.trig_change.length; i++) {
+		this.trig_change[i](rel.a, rel.b);
+	}
+};
 
 Fabric.prototype.lookupNode = function(label) {
 	var res = this.label2node[label];
@@ -231,6 +245,7 @@ Fabric.prototype.set = function(a,b,c) {
 		this.relations[a][b] = rel;
 	}
 	rel.setvalue(c);
+	this.triggerChange(rel);
 }
 
 function list() {

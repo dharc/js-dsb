@@ -3,6 +3,7 @@ var url = require("url");
 var fabric = require("./fabric");
 var users = require("./users");
 var projects = require("./projects");
+var framer = require("./framer");
 
 var current_user;
 
@@ -192,6 +193,47 @@ function h_fabric_labels(query, vars, data, response) {
 }
 
 
+/* ========== Framers hooks ========== */
+
+/* List all existing framers */
+
+function h_framers(query, vars, data, response) {
+
+}
+
+/*
+ * Construct a framer for a given fabric.
+ * Can be configured to respond in particular ways.
+ */
+
+function h_framers_create(query, vars, data, response) {
+	var fab = fabric.get(query.fid);
+	if (fab !== undefined) {
+		var framid = framer.create(fab);
+		response.write('{"success": "true", "id": "'+framid+'"}');
+	} else {
+		response.write('{"success": "false"}');
+	}
+}
+
+function h_framer(query, vars, data, response) {
+	var frame = framer.get(vars[0]);
+	if (frame === undefined) {
+		response.write("undefined");
+	} else {
+		response.write(JSON.stringify(frame.dump()));
+	}
+}
+
+function h_framer_suggest(query, vars, data, response) {
+
+}
+
+function h_framer_focus(query, vars, data, response) {
+
+}
+
+
 /* ========== Hooks Table ========== */
 
 /* All registered service hooks, corresponding to the URL given */
@@ -206,6 +248,13 @@ var hooks = {
 		"views":		{ hook: h_project_views },
 		"wspaces":		{ hook: h_project_wspaces },
 		"layouts":		{ hook: h_project_layouts }
+	}},
+	"framers":			{ hook: h_framers, children: {
+		"create":		{ hook: h_framers_create }
+	}},	
+	"framer":			{ hook: h_framer, vars: 1, children: {
+		"suggest":		{ hook: h_framer_suggest },
+		"focus":		{ hook: h_framer_focus }
 	}},
 	"fabrics":			{ hook: h_fabrics, children: {
 		"create":		{ hook: h_fabrics_create }

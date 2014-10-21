@@ -99,10 +99,10 @@ var dsb = {};
 	/*
 	 * Add a new named handle to a given fabric.
 	 */
-	function createHandle(fabid, hname, cb) {
+	function createHandle(fabid, hname, gname, cb) {
 		sendCommand(
 			"/fabric/"+fabid+"/handles/create",
-			{name: hname},
+			{name: hname, rela: gname, relb: hname},
 			undefined,
 			cb
 		);
